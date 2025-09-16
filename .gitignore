@@ -1,0 +1,12 @@
+# dependencies
+/node_modules
+
+# dotenv environment variables
+.env
+
+# production build
+/dist
+/build
+
+# lock file (nếu không muốn push)
+/package-lock.json
