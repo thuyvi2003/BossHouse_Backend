@@ -9,7 +9,7 @@ var mongoose = require('mongoose');
 //Import router in here 
 const promotionRouter = require('./routes/promotion.routes');
 
-
+const authRouter = require('./routes/auth.routes');
 
 var app = express();
 // Connect to MongoDB
@@ -28,7 +28,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+// Routes
+app.use('/api/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
