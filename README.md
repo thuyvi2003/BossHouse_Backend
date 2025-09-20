@@ -28,18 +28,17 @@ git push origin ViVLT
 ▼△▼△▼△▼△▼ Cách commit tên nhánh + mô tả công việc ví dụ: "ViVLT: Edit promotion function" ▼△▼△▼△▼△▼
 
 
-▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄
+▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀
 
 
                     ·̩̩̥͙＊*•̩̩͙✩•̩̩͙*˚˚*•̩̩͙✩•̩̩͙*˚＊·̩̩̥͙ℚ𝕌𝕐 𝕋Ắℂ 𝔾𝕀𝕋 – 𝕋𝔼𝔸𝕄 𝕎𝕆ℝ𝕂𝔽𝕃𝕆𝕎·̩̩̥͙＊*•̩̩͙✩•̩̩͙*˚˚*•̩̩͙✩•̩̩͙*˚＊·̩̩̥͙
-
 
 
 🌸 Đặt tên nhánh
 
 - Tên nhánh phải rõ ràng, có ý nghĩa.
 
-Ví dụ: feature/login-page, fix/cart-bug.
+Ví dụ: ViVLT
 
 => Nếu đặt sai tên nhánh → KHÔNG ĐƯỢC MERGE.
 
@@ -47,7 +46,7 @@ Ví dụ: feature/login-page, fix/cart-bug.
 
 - Commit phải mô tả rõ ràng nội dung thay đổi.
 
-Ví dụ: fix: lỗi hiển thị giỏ hàng, feat: thêm chức năng đăng nhập.
+Ví dụ: git commit -m"ViVLT: Fix conflic"
 
 => Nếu không ghi commit hoặc ghi mơ hồ → KHÔNG ĐƯỢC MERGE.
 
@@ -77,4 +76,5 @@ Khi tạo PR, phải báo cho người quản lý Git để được duyệt.
 
 🌸 Không được push file lạ lên 
 
-▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀
+▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀
+
