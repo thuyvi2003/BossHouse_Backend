@@ -1,4 +1,4 @@
-(ෆ˙ᵕ˙ෆ)♡ ℍ𝕌Ớℕ𝔾 𝔻Ẫℕ 𝕊Ử 𝔻Ụℕ𝔾 𝔾𝕀𝕋 (ෆ˙ᵕ˙ෆ)♡
+                                       (ෆ˙ᵕ˙ෆ)♡ ℍ𝕌Ớℕ𝔾 𝔻Ẫℕ 𝕊Ử 𝔻Ụℕ𝔾 𝔾𝕀𝕋 (ෆ˙ᵕ˙ෆ)♡
 
 1/Clone repo về máy:
 
@@ -25,6 +25,7 @@ git push origin ViVLT
 5/Tạo Pull Request (PR) trên GitHub → merge vào develop
 
 ▼△▼△▼△▼△▼ Cách đặt tên nhánh studentCode ví dụ: ViVLT  ▼△▼△▼△▼△▼
+
 ▼△▼△▼△▼△▼ Cách commit tên nhánh + mô tả công việc ví dụ: "ViVLT: Edit promotion function" ▼△▼△▼△▼△▼
 
 
