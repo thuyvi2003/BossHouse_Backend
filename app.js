@@ -5,6 +5,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+var cors = require('cors');
 
 //Import router in here 
 const promotionRouter = require('./routes/promotion.routes');
@@ -27,6 +28,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ Enable CORS for all routes
+app.use(cors());
 
 // Routes
 app.use('/api/auth', authRouter);
