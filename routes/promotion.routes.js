@@ -5,5 +5,7 @@ const promotionController = require('../controllers/promotion.controller');
 
 //Router
 router.post('/', promotionController.createPromotion);
-router.get('/',promotionController.getAllPromotionsAdmin);
-router.get('/',promotionController.getAllPromotionsUser);
+router.get('/admin',promotionController.getAllPromotionsAdmin);
+router.get('/user',promotionController.getAllPromotionsUser);
+
+module.exports = router;

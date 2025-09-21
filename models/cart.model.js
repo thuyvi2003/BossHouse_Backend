@@ -1,106 +1,86 @@
-//Vo Lam Thuy Vi
+// Vo Lam Thuy Vi
 const mongoose = require('mongoose');
 
-// Cart Item Schema
-const cartItemSchema = new mongoose.Schema({
-  cart_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Cart',
-    required: true
-  },
-  variation_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ProductVariation',
-    required: true
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  added_at: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-// Cart Schema
 const cartSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  discount_id: {
+  promotion_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Discount'
+    ref: 'Promotion',
+    default: null
   },
-  original_price: {
+  original_price: { 
     type: Number,
     default: 0
   },
-  discount_amount: {
+  promotion_amount: { 
     type: Number,
     default: 0
   },
-  total_price: {
+  total_price: { 
     type: Number,
     default: 0
   }
 }, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  },
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Virtual for cart items
+// Virtual populate items trong giỏ
 cartSchema.virtual('items', {
   ref: 'CartItem',
   localField: '_id',
   foreignField: 'cart_id'
 });
 
-// Pre-save middleware to calculate total price
+// Middleware tính lại giá trước khi lưu
 cartSchema.pre('save', async function(next) {
-  if (this.isModified('discount_id')) {
-    // Lấy danh sách cart items
-    const CartItem = mongoose.model('CartItem');
-    const cartItems = await CartItem.find({ cart_id: this._id }).populate('variation_id');
-    
-    let total = 0;
-    
-    if (cartItems && cartItems.length > 0) {
-      for (const item of cartItems) {
-        if (item.variation_id && item.variation_id.price) {
-          total += item.variation_id.price * item.quantity;
-        }
+  const CartItem = mongoose.model('CartItem');
+  const Promotion = mongoose.model('Promotion');
+
+  // Lấy danh sách items
+  const cartItems = await CartItem.find({ cart_id: this._id }).populate('variation_id');
+
+  let original = 0;
+  if (cartItems && cartItems.length > 0) {
+    for (const item of cartItems) {
+      if (item.variation_id && item.variation_id.price) {
+        original += item.variation_id.price * item.quantity;
       }
     }
-    
-    // Apply discount if exists
-    if (this.discount_id) {
-      await this.populate('discount_id');
-      const discount = this.discount_id;
-      
-      if (discount && discount.isValid()) {
-        if (discount.discount_type === 'percentage') {
-          total = total * (1 - discount.discount_value / 100);
-        } else if (discount.discount_type === 'fixed') {
-          total = Math.max(0, total - discount.discount_value);
-        }
-      }
-    }
-    
-    this.total_price = total;
   }
-  
+
+  this.original_price = original;
+  this.promotion_amount = 0;
+  this.total_price = original;
+
+  // Nếu có promotion
+  if (this.promotion_id) {
+    const promo = await Promotion.findById(this.promotion_id);
+
+    if (promo && (!promo.expires_at || promo.expires_at > new Date())) {
+      let promotionValue = 0;
+
+      if (promo.promotion_type === 'percent') {
+        promotionValue = (original * promo.promotion_value) / 100;
+        if (promo.max_discount_value) {
+          promotionValue = Math.min(promotionValue, promo.max_discount_value);
+        }
+      } else if (promo.promotion_type === 'fixed') {
+        promotionValue = promo.promotion_value;
+      }
+
+      this.promotion_amount = Math.min(original, promotionValue);
+      this.total_price = original - this.promotion_amount;
+    }
+  }
+
   next();
 });
 
 const Cart = mongoose.model('Cart', cartSchema);
-const CartItem = mongoose.model('CartItem', cartItemSchema);
-
-module.exports = { Cart, CartItem }; 
+module.exports = Cart;
