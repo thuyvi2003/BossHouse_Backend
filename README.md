@@ -26,7 +26,7 @@ git push origin ViVLT
 
 ▼△▼△▼△▼△▼ Cách đặt tên nhánh studentCode ví dụ: ViVLT  ▼△▼△▼△▼△▼
 
-▼△▼△▼△▼△▼ Cách commit tên nhánh + mô tả công việc ví dụ: "ViVLT: Edit promotion function" ▼△▼△▼△▼△▼
+▼△▼△ Cách commit tên nhánh + mô tả công việc ví dụ: "ViVLT: Edit promotion function" ▼△▼△
 
 
 ▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▄▀▄▀▄▀▄▀▄▀
