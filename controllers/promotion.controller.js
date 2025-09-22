@@ -7,6 +7,7 @@ exports.createPromotion = async (req, res, next) => {
         const promotion = await promotionService.createPromotion(promotionData);
         res.status(201).json({
             status: 'success',
+            message:'Create promotion is successfully',
             data: promotion
         });
     } catch (error) {
@@ -18,6 +19,7 @@ exports.getAllPromotionsAdmin = async (req, res, next) => {
         const promotionsList = await promotionService.getAllPromotionsAdmin();
         res.status(200).json({
             status: 'success',
+            message:'Get all promotions list is successfully',
             data: promotionsList
         });
     } catch (error) {
@@ -32,6 +34,7 @@ exports.getAllPromotionsUser = async (req, res, next) => {
         const promotionsList = await promotionService.getAllPromotionsUser(userId);
         res.status(200).json({
             status: 'success',
+            message:'Get all promotions list is successfully',
             data: promotionsList
         });
     } catch (error) {
