@@ -1,7 +1,4 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user.model.js");
-
-const protectRoute = (requiredRole) => async (req, res, next) => {
+const protectRoute = (requiredRoles) => async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -21,9 +18,13 @@ const protectRoute = (requiredRole) => async (req, res, next) => {
             return res.status(403).json({ message: "Account is banned" });
         }
 
-        // Check if user has the required role (if specified)
-        if (requiredRole && user.role !== requiredRole) {
-            return res.status(403).json({ message: `Access denied: ${requiredRole} role required` });
+        // Check if user has one of the required roles (if specified)
+        // Now, requiredRoles can be a string or an array of strings
+        if (requiredRoles) {
+            const rolesArray = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+            if (!rolesArray.includes(user.role)) {
+                return res.status(403).json({ message: `Access denied: One of the following roles is required: ${rolesArray.join(', ')}` });
+            }
         }
 
         req.user = user;
