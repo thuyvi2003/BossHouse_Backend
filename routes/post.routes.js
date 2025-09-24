@@ -2,6 +2,23 @@ const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/post.controller');
 const authMiddleware = require('../middleware/auth.middleware');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const uploadsDir = path.join(__dirname, '../public/uploads');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    try { fs.mkdirSync(uploadsDir, { recursive: true }); } catch {}
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname || '');
+    cb(null, unique);
+  }
+});
+const upload = multer({ storage });
+
 
 // // ==================== ADMIN ROUTES ====================
 // router.post('/', authMiddleware.protectRoute, authMiddleware.requireRoles(['admin']), postController.createPost);
@@ -25,5 +42,12 @@ router.get('/', postController.getAllPosts);
 router.get('/search', postController.searchPosts);
 router.get('/filter', postController.filterPosts);
 router.get('/:id', postController.getPostById);
+
+// ==================== UPLOAD (LOCAL DISK) ====================
+router.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ status: 'error', message: 'No file uploaded' });
+  const publicUrl = `/uploads/${req.file.filename}`;
+  res.status(201).json({ status: 'success', url: publicUrl, filename: req.file.filename });
+});
 
 module.exports = router;

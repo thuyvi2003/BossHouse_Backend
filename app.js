@@ -13,6 +13,7 @@ const cors = require("cors");
 const promotionRouter = require('./routes/promotion.routes');
 const authRouter = require('./routes/auth.routes');
 const cartRouter = require('./routes/cart.routes');
+const postRouter = require('./routes/post.routes');
 
 
 var app = express();
@@ -31,6 +32,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+// serve uploads as static
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // ✅ Enable CORS for all routes
 app.use(cors());
@@ -39,6 +42,7 @@ app.use(cors());
 app.use('/api/auth', authRouter);
 app.use('/api/promotions', promotionRouter);
 app.use('/api/carts', cartRouter);
+app.use('/api/posts', postRouter);
 
 // Catch 404 and forward to error handler
 app.use(function (req, res, next) {
