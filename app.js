@@ -1,5 +1,3 @@
-/** ⛔⛔⛔    CẢNH BÁO: ĐỌC FILE README TRƯỚC KHI CODE  ⛔⛔⛔  */
-
 require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
@@ -14,6 +12,9 @@ const promotionRouter = require("./routes/promotion.routes");
 const authRouter = require("./routes/auth.routes");
 const cartRouter = require("./routes/cart.routes");
 const bookingRouter = require("./routes/booking.routes");
+const categoryRouter = require("./routes/category.routes");
+const productRouter = require("./routes/product.routes");
+const productVariationRouter = require("./routes/productVariation.routes");
 
 const app = express();
 
@@ -27,34 +28,41 @@ mongoose
     console.error("❌ Error connecting to MongoDB", err);
   });
 
-// ✅ Import all models to register with mongoose
+// ✅ Import all models
 require("./models/user.model");
 require("./models/pet.model");
 require("./models/service.model");
 require("./models/veterinarian.model");
 require("./models/vetSchedule.model");
 require("./models/booking.model");
+require("./models/category.model");
+require("./models/product.model");
+require("./models/productVariation.model");
+
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(cors());
+
+// ✅ Tăng giới hạn body size để tránh lỗi 413
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
-// ✅ Enable CORS for all routes
-app.use(cors());
 
 // ✅ API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/bookings", bookingRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/products", productRouter);
+app.use("/api/variations", productVariationRouter);
 
-// Catch 404 and forward to error handler
+// Catch 404
 app.use(function (req, res, next) {
   next(createError(404));
 });
