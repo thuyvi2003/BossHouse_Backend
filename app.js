@@ -18,10 +18,11 @@ const productVariationRouter = require("./routes/productVariation.routes");
 const petRouter = require("./routes/pet.routes");
 const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
+const postRouter = require("./routes/post.routes");
 
 const app = express();
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
@@ -31,7 +32,7 @@ mongoose
     console.error("❌ Error connecting to MongoDB", err);
   });
 
-// ✅ Import all models
+// (giữ nếu dự án có các model)
 require("./models/user.model");
 require("./models/pet.model");
 require("./models/service.model");
@@ -42,21 +43,20 @@ require("./models/category.model");
 require("./models/product.model");
 require("./models/productVariation.model");
 
-
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
+// Middlewares
 app.use(logger("dev"));
 app.use(cors());
-
-// ✅ Tăng giới hạn body size để tránh lỗi 413
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// ✅ API Routes
+// API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
@@ -67,6 +67,7 @@ app.use("/api/variations", productVariationRouter);
 app.use("/api/pets", petRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
+app.use("/api/posts", postRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
@@ -77,7 +78,6 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
   res.status(err.status || 500);
   res.render("error");
 });
