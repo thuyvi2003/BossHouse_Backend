@@ -1,5 +1,3 @@
-/** ⛔⛔⛔    CẢNH BÁO: ĐỌC FILE README TRƯỚC KHI CODE  ⛔⛔⛔  */
-
 require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
@@ -9,42 +7,69 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-//Import router in here 
-const promotionRouter = require('./routes/promotion.routes');
-const authRouter = require('./routes/auth.routes');
-const cartRouter = require('./routes/cart.routes');
-const postRouter = require('./routes/post.routes');
+// Routers
+const promotionRouter = require("./routes/promotion.routes");
+const authRouter = require("./routes/auth.routes");
+const cartRouter = require("./routes/cart.routes");
+const bookingRouter = require("./routes/booking.routes");
+const categoryRouter = require("./routes/category.routes");
+const productRouter = require("./routes/product.routes");
+const productVariationRouter = require("./routes/productVariation.routes");
+const petRouter = require("./routes/pet.routes");
+const serviceRouter = require("./routes/service.routes");
+const vetRouter = require("./routes/veterinarian.routes");
+const postRouter = require("./routes/post.routes");
 
+const app = express();
 
-var app = express();
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI).then(() => {
-  console.log('"🌟🔮 MongoDB Ready to Serve 🍀⚡"');
-}).catch(err => {
-  console.error('Error connecting to MongoDB', err);
-});
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("🌟🔮 MongoDB Ready to Serve 🍀⚡");
+  })
+  .catch((err) => {
+    console.error("❌ Error connecting to MongoDB", err);
+  });
 
+// (giữ nếu dự án có các model)
+require("./models/user.model");
+require("./models/pet.model");
+require("./models/service.model");
+require("./models/veterinarian.model");
+require("./models/vetSchedule.model");
+require("./models/booking.model");
+require("./models/category.model");
+require("./models/product.model");
+require("./models/productVariation.model");
+
+// View engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
+
+// Middlewares
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(cors());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-// serve uploads as static
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// ✅ Enable CORS for all routes
-app.use(cors());
+// API Routes
+app.use("/api/auth", authRouter);
+app.use("/api/promotions", promotionRouter);
+app.use("/api/carts", cartRouter);
+app.use("/api/bookings", bookingRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/products", productRouter);
+app.use("/api/variations", productVariationRouter);
+app.use("/api/pets", petRouter);
+app.use("/api/services", serviceRouter);
+app.use("/api/veterinarians", vetRouter);
+app.use("/api/posts", postRouter);
 
-// Routes
-app.use('/api/auth', authRouter);
-app.use('/api/promotions', promotionRouter);
-app.use('/api/carts', cartRouter);
-app.use('/api/posts', postRouter);
-
-// Catch 404 and forward to error handler
+// Catch 404
 app.use(function (req, res, next) {
   next(createError(404));
 });
@@ -53,7 +78,6 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
   res.status(err.status || 500);
   res.render("error");
 });
