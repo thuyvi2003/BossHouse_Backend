@@ -113,9 +113,9 @@ const getVariationStatsValidation = [
 // POST /products/:productId/variations - Create a new product variation
 router.post(
   "/:productId/variations",
-  protectRoute, // Authentication required
-  uploadSingle("image"), // Handle single image upload
-  handleUploadError, // Handle upload errors
+  protectRoute(['admin']),
+  uploadSingle("image"), 
+  handleUploadError,
   createProductVariationValidation,
   handleValidationErrors,
   createProductVariationController
@@ -148,9 +148,9 @@ router.get(
 // PUT /variations/:variationId - Update product variation
 router.put(
   "/:variationId",
-  protectRoute, // Authentication required
-  uploadSingle("image"), // Handle single image upload
-  handleUploadError, // Handle upload errors
+  protectRoute(['admin']), 
+  uploadSingle("image"), 
+  handleUploadError, 
   updateProductVariationValidation,
   handleValidationErrors,
   updateProductVariationController
@@ -159,7 +159,7 @@ router.put(
 // DELETE /variations/:variationId - Delete product variation (soft delete by default, hard delete with ?hardDelete=true)
 router.delete(
   "/:variationId",
-  protectRoute, // Authentication required
+  protectRoute(['admin']),
   deleteProductVariationValidation,
   handleValidationErrors,
   deleteProductVariationController

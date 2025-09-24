@@ -236,9 +236,9 @@ const searchProductsValidation = [
 // POST /products - Create a new product
 router.post(
   "/",
-  protectRoute, // Authentication required
-  uploadSingle("image"), // Handle single image upload
-  handleUploadError, // Handle upload errors
+  protectRoute(['admin']),  
+  uploadSingle("image"),  
+  handleUploadError,  
   createProductValidation,
   handleValidationErrors,
   createProductController
@@ -274,9 +274,9 @@ router.get(
 // PUT /products/:id - Update product
 router.put(
   "/:id",
-  protectRoute, // Authentication required
-  uploadSingle("image"), // Handle single image upload
-  handleUploadError, // Handle upload errors
+  protectRoute(['admin']),  
+  uploadSingle("image"),  
+  handleUploadError,  
   updateProductValidation,
   handleValidationErrors,
   updateProductController
@@ -285,7 +285,7 @@ router.put(
 // DELETE /products/:id - Delete product (soft delete by default, hard delete with ?hardDelete=true)
 router.delete(
   "/:id",
-  protectRoute, // Authentication required
+  protectRoute(['admin']),
   deleteProductValidation,
   handleValidationErrors,
   deleteProductController
