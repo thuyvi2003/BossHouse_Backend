@@ -4,7 +4,12 @@ const bookingSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     pet_id: { type: mongoose.Schema.Types.ObjectId, ref: "Pet", required: true },
-    service_id: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
+    services: [
+      {
+        service_id: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
     veterinarian_id: { type: mongoose.Schema.Types.ObjectId, ref: "Veterinarian" },
 
     booking_date: { type: Date, required: true },

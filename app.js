@@ -15,6 +15,9 @@ const bookingRouter = require("./routes/booking.routes");
 const categoryRouter = require("./routes/category.routes");
 const productRouter = require("./routes/product.routes");
 const productVariationRouter = require("./routes/productVariation.routes");
+const petRouter = require("./routes/pet.routes");
+const serviceRouter = require("./routes/service.routes");
+const vetRouter = require("./routes/veterinarian.routes");
 
 const app = express();
 
@@ -61,6 +64,9 @@ app.use("/api/bookings", bookingRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 app.use("/api/variations", productVariationRouter);
+app.use("/api/pets", petRouter);
+app.use("/api/services", serviceRouter);
+app.use("/api/veterinarians", vetRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
