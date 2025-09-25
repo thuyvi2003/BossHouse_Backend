@@ -31,11 +31,11 @@ exports.addToCart = async (userId, variationId, quantity) => {
     return populateCart;
 }
 exports.getCartsByUser = async (userId) => {
-    const cartList = await Cart.find({ user_id: userId }).populate({
+    const cart = await Cart.findOne({ user_id: userId }).populate({
         path: 'items',
         populate: { path: 'variation_id' }
     })
-    return cartList;
+    return cart;
 }
 exports.editCartItemQuantity = async (userId, itemId, newQuantity) => {
     const cart = await Cart.findOne({ user_id: userId })
@@ -68,6 +68,7 @@ exports.removeItem = async (userId, variationId) => {
     if (!deleted) {
         throw new Error("Cart item not found!")
     }
+    
     return;
 }
 exports.clearAllCart = async (userId) => {
