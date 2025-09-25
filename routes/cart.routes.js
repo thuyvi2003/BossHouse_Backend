@@ -10,8 +10,9 @@ router.post('/', protectRoute(), cartController.addToCart);
 router.get('/', protectRoute(), cartController.getCartsByUser);
 router.put('/', protectRoute(), cartController.editCartItemQuantity);
 router.delete('/',protectRoute(), cartController.removeItem);
-router.delete('/clear', function (req, res, next) {
-    req.user_id = "66f32e9a25208e1c4b89ea01";
-    next()
-}, cartController.clearAllCart)
+router.delete('/clear',protectRoute(), cartController.clearAllCart)
+// router.delete('/clear', function (req, res, next) {
+//     req.user_id = "66f32e9a25208e1c4b89ea01";
+//     next()
+// }, cartController.clearAllCart)
 module.exports = router;
