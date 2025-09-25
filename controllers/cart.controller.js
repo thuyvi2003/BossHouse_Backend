@@ -3,8 +3,9 @@ const cartService = require('../services/cart.services');
 
 exports.addToCart = async (req, res, next) => {
     try {
-        const { user_id, variation_id, quantity } = req.body;
-        const cart = await cartService.addToCart(user_id, variation_id, quantity);
+        const userId = req.user._id;
+        const { variation_id, quantity } = req.body;
+        const cart = await cartService.addToCart(userId, variation_id, quantity);
         res.status(200).json({
             status: 'success',
             message: 'Add product to cart is successfully',
@@ -43,7 +44,7 @@ exports.editCartItemQuantity = async (req, res, next) => {
 }
 exports.removeItem = async (req, res, next) => {
     try {
-        const user_id = req.user_id;
+        const user_id = req.user._id;
         console.log("ĐÂY LÀ USERID", user_id)
         const { variation_id } = req.body;
         const deleted = await cartService.removeItem(user_id, variation_id)
