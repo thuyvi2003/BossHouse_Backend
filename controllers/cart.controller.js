@@ -59,7 +59,7 @@ exports.removeItem = async (req, res, next) => {
 }
 exports.clearAllCart = async (req, res, next) => {
     try {
-        const user_id = req.user_id;
+        const user_id = req.user._id;
         console.log("ĐÂY LÀ USERID", user_id);
         const cartClear = await cartService.clearAllCart(user_id);
         res.status(200).json({
