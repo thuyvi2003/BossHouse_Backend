@@ -151,7 +151,7 @@ const searchCategoriesValidation = [
 // POST /categories - Create a new category
 router.post(
     "/",
-    protectRoute,             // user phải login
+    protectRoute(['admin']),
     createCategoryValidation,
     handleValidationErrors,
     createCategoryController
@@ -190,7 +190,7 @@ router.get(
 // PUT /categories/:id - Update category
 router.put(
     "/:id",
-    protectRoute,
+    protectRoute(['admin']),
     updateCategoryValidation,
     handleValidationErrors,
     updateCategoryController
@@ -199,7 +199,7 @@ router.put(
 // DELETE /categories/:id - Delete category (soft delete by default, hard delete with ?hardDelete=true)
 router.delete(
     "/:id",
-    protectRoute,
+    protectRoute(['admin']),
     deleteCategoryValidation,
     handleValidationErrors,
     deleteCategoryController
