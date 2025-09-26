@@ -38,27 +38,30 @@ exports.getCartsByUser = async (userId) => {
     return cart;
 }
 exports.editCartItemQuantity = async (userId, itemId, newQuantity) => {
-    const cart = await Cart.findOne({ user_id: userId })
-    if (!cart) {
-        throw new Error("Cart not found!!")
-    }
-    const cartItem = await CartItem.findOne({ _id: itemId, cart_id: cart._id })
-    if (!cartItem) {
-        throw new Error("Cart not found!!!!!!!!!!")
-    }
+  const cart = await Cart.findOne({ user_id: userId });
+  if (!cart) {
+    throw new Error("Cart not found!!");
+  }
+  const cartItem = await CartItem.findOne({ _id: itemId, cart_id: cart._id });
+  if (!cartItem) {
+    throw new Error("Cart item not found!");
+  }
 
-    if (newQuantity <= 0) {
-        await CartItem.deleteOne({ _id: itemId })
-    } else {
-        cartItem.quantity = newQuantity;
-    }
+  if (newQuantity <= 0) {
+    await CartItem.deleteOne({ _id: itemId });
+  } else {
+    cartItem.quantity = newQuantity;
     await cartItem.save();
-    const updatedCart = await Cart.findById(cart._id).populate({
-        path: 'items',
-        populate: { path: 'variation_id' }
-    })
-    return updatedCart;
-}
+  }
+
+  const updatedCart = await Cart.findById(cart._id).populate({
+    path: 'items',
+    populate: { path: 'variation_id' }
+  });
+
+  return updatedCart;
+};
+
 exports.removeItem = async (userId, variationId) => {
     const cart = await Cart.findOne({ user_id: userId })
     if (!cart) {

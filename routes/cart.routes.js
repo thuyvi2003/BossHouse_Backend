@@ -8,7 +8,7 @@ const protectRoute = require('../middleware/auth.middleware');
 router.post('/', protectRoute(), cartController.addToCart);
 //Thieu middleware decode token de lay userId
 router.get('/', protectRoute(), cartController.getCartsByUser);
-router.put('/', protectRoute(), cartController.editCartItemQuantity);
+router.put('/:itemId', protectRoute(), cartController.editCartItemQuantity);
 router.delete('/',protectRoute(), cartController.removeItem);
 router.delete('/clear',protectRoute(), cartController.clearAllCart)
 // router.delete('/clear', function (req, res, next) {

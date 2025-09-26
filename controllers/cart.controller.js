@@ -32,18 +32,30 @@ exports.getCartsByUser = async (req, res, next) => {
     }
 }
 exports.editCartItemQuantity = async (req, res, next) => {
-    try {
-        const { user_id, item_id, quantity } = req.body;
-        const cartIsUpdated = await cartService.editCartItemQuantity(user_id, item_id, quantity);
-        res.status(200).json({
-            status: 'success',
-            message: 'Update quantity is successfully',
-            data: cartIsUpdated
-        });
-    } catch (error) {
-        next(error)
-    }
-}
+  try {
+    const userId = req.user._id;
+    const itemId = req.params.itemId; 
+    const { quantity } = req.body; 
+    console.log("req.body", req.body);
+console.log("itemId", req.params.itemId);
+
+
+    const cartIsUpdated = await cartService.editCartItemQuantity(
+      userId,
+      itemId,
+      quantity
+    );
+console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",quantity);
+    res.status(200).json({
+      status: 'success',
+      message: 'Update quantity is successfully',
+      data: cartIsUpdated
+    });
+  } catch (error) {
+    console.log("Loi loi loi ", error); 
+    next(error);
+  }
+};
 exports.removeItem = async (req, res, next) => {
     try {
         const user_id = req.user._id;
