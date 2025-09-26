@@ -15,7 +15,9 @@ exports.addToCart = async (req, res, next) => {
         next(error);
     }
 }
-//Thieu middleware decode token de lay userId
+
+
+
 exports.getCartsByUser = async (req, res, next) => {
     try {
         const userId = req.user._id;
