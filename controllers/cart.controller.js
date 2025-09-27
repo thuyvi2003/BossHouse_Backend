@@ -24,57 +24,56 @@ exports.getCartsByUser = async (req, res, next) => {
         const cartsList = await cartService.getCartsByUser(userId);
         res.status(200).json({
             status: 'success',
-            message: 'Get cart is successfully',
+            message: 'Get cart successfully',
             data: cartsList
         });
     } catch (error) {
         next(error);
     }
 }
+
+
 exports.editCartItemQuantity = async (req, res, next) => {
-  try {
-    const userId = req.user._id;
-    const itemId = req.params.itemId; 
-    const { quantity } = req.body; 
-    console.log("req.body", req.body);
-console.log("itemId", req.params.itemId);
-
-
-    const cartIsUpdated = await cartService.editCartItemQuantity(
-      userId,
-      itemId,
-      quantity
-    );
-console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",quantity);
-    res.status(200).json({
-      status: 'success',
-      message: 'Update quantity is successfully',
-      data: cartIsUpdated
-    });
-  } catch (error) {
-    console.log("Loi loi loi ", error); 
-    next(error);
-  }
+    try {
+        const userId = req.user._id;
+        const itemId = req.params.itemId;
+        const { quantity } = req.body;
+        const cartIsUpdated = await cartService.editCartItemQuantity(
+            userId,
+            itemId,
+            quantity
+        );
+        res.status(200).json({
+            status: 'success',
+            message: 'Update quantity successfully',
+            data: cartIsUpdated
+        });
+    } catch (error) {
+        next(error);
+    }
 };
+
+
 exports.removeItem = async (req, res, next) => {
     try {
         const user_id = req.user._id;
-        console.log("ĐÂY LÀ USERID", user_id)
         const { variation_id } = req.body;
         const deleted = await cartService.removeItem(user_id, variation_id)
         res.status(200).json({
             status: 'success',
-            message: 'Remove item is successfully',
+            message: 'Remove item successfully',
             data: deleted
         });
     } catch (error) {
         next(error)
     }
 }
+
+
+
 exports.clearAllCart = async (req, res, next) => {
     try {
         const user_id = req.user._id;
-        console.log("ĐÂY LÀ USERID", user_id);
         const cartClear = await cartService.clearAllCart(user_id);
         res.status(200).json({
             status: 'success',

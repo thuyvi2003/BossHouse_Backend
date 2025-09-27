@@ -5,14 +5,9 @@ const cartController = require('../controllers/cart.controller');
 const protectRoute = require('../middleware/auth.middleware');
 
 //Router
-router.post('/', protectRoute(), cartController.addToCart);
-//Thieu middleware decode token de lay userId
-router.get('/', protectRoute(), cartController.getCartsByUser);
-router.put('/:itemId', protectRoute(), cartController.editCartItemQuantity);
-router.delete('/',protectRoute(), cartController.removeItem);
-router.delete('/clear',protectRoute(), cartController.clearAllCart)
-// router.delete('/clear', function (req, res, next) {
-//     req.user_id = "66f32e9a25208e1c4b89ea01";
-//     next()
-// }, cartController.clearAllCart)
+router.post('/', protectRoute(['user', 'veterinarian']), cartController.addToCart);
+router.get('/', protectRoute(['user', 'veterinarian']), cartController.getCartsByUser);
+router.put('/:itemId', protectRoute(['user', 'veterinarian']), cartController.editCartItemQuantity);
+router.delete('/', protectRoute(['user', 'veterinarian']), cartController.removeItem);
+router.delete('/clear', protectRoute(['user', 'veterinarian']), cartController.clearAllCart)
 module.exports = router;
