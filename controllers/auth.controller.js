@@ -1,4 +1,4 @@
-const { loginService, registerService, resendOTP, verifyOTP, forgotPasswordService, resetPasswordService } = require("../services/auth.services.js");
+const { loginService, registerService, resendOTP, verifyOTP, forgotPasswordService, resetPasswordService, googleLoginService } = require("../services/auth.services.js");
 
 const login = async (req, res) => {
     try {
@@ -66,4 +66,16 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { login, register, verify, resend, forgotPassword, resetPassword };
+// Google OAuth2 login controller
+const googleLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+        const data = await googleLoginService(idToken);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Error in Google login controller:", error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { login, register, verify, resend, forgotPassword, resetPassword, googleLogin };

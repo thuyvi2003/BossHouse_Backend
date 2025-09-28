@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const NodeCache = require("node-cache");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { OAuth2Client } = require("google-auth-library");
 
 // Initialize in-memory cache for OTP and reset tokens
 const otpCache = new NodeCache({
@@ -28,6 +29,10 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
+// Google OAuth2 client
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const generateToken = (userId) => {
     return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "99d" });
@@ -173,6 +178,11 @@ const forgotPasswordService = async (email) => {
         throw new Error("No user found with this email!");
     }
 
+    // 🚫 Block Google-only accounts from using forgot password
+    if (!user.password && user.google_id) {
+        throw new Error("This account uses Google login. Please sign in with Google.");
+    }
+
     const resetToken = crypto.randomBytes(32).toString("hex");
     resetTokenCache.set(resetToken, { email });
 
@@ -180,6 +190,7 @@ const forgotPasswordService = async (email) => {
 
     return { success: true, message: "Password reset link sent to your email!" };
 };
+
 
 const resetPasswordService = async (email, token, newPassword, confirmPassword) => {
     if (!email || !token || !newPassword || !confirmPassword) {
@@ -212,4 +223,84 @@ const resetPasswordService = async (email, token, newPassword, confirmPassword) 
     return { success: true, message: "Password reset successful!" };
 };
 
-module.exports = { loginService, registerService, resendOTP, verifyOTP, forgotPasswordService, resetPasswordService };
+// Google OAuth2 login service
+const googleLoginService = async (idToken) => {
+    if (!idToken) {
+        throw new Error("Google ID token is required!");
+    }
+
+    try {
+        // Verify the ID token
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload) {
+            throw new Error("Invalid Google token payload!");
+        }
+
+        const { sub: googleId, email, name, picture } = payload;
+
+        if (!email) {
+            throw new Error("Email not found in Google token!");
+        }
+
+        // Check if user already exists
+        let user = await User.findOne({
+            $or: [
+                { email },
+                { google_id: googleId }
+            ]
+        });
+
+        if (!user) {
+            // Create new user with Google data
+            user = new User({
+                name: name || 'Google User',
+                email,
+                google_id: googleId,
+                profile_image: picture || `https://api.dicebear.com/9.x/avataaars/svg?seed=${email}`,
+                role: 'user',
+                // No password set for Google users
+            });
+
+            await user.save();
+        } else if (!user.google_id) {
+            // User exists with email but not linked to Google
+            // Update to link with Google
+            user.google_id = googleId;
+            user.profile_image = picture || user.profile_image;
+            await user.save();
+        }
+
+        // Generate JWT token
+        const token = generateToken(user._id);
+
+        return {
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                profile_image: user.profile_image,
+                role: user.role,
+                created_at: user.created_at,
+            },
+        };
+    } catch (error) {
+        console.error("Google login error:", error);
+        throw new Error("Failed to authenticate with Google!");
+    }
+};
+
+module.exports = {
+    loginService,
+    registerService,
+    resendOTP,
+    verifyOTP,
+    forgotPasswordService,
+    resetPasswordService,
+    googleLoginService
+};
