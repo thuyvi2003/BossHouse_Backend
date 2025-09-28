@@ -26,51 +26,13 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// Validation rules
+// Validation rules - Simplified
 const createCategoryValidation = [
-    body('name')
-        .trim()
-        .notEmpty()
-        .withMessage('Category name is required')
-        .isLength({ min: 2, max: 50 })
-        .withMessage('Category name must be between 2 and 50 characters'),
-    body('description')
-        .optional()
-        .trim()
-        .isLength({ max: 200 })
-        .withMessage('Description cannot exceed 200 characters'),
-    body('status')
-        .optional()
-        .isIn(['active', 'inactive'])
-        .withMessage('Status must be either active or inactive'),
-    body('image')
-        .optional()
-        .isURL()
-        .withMessage('Image must be a valid URL')
+    body('name').trim().notEmpty().withMessage('Category name is required')
 ];
 
 const updateCategoryValidation = [
-    param('id')
-        .isMongoId()
-        .withMessage('Invalid category ID'),
-    body('name')
-        .optional()
-        .trim()
-        .isLength({ min: 2, max: 50 })
-        .withMessage('Category name must be between 2 and 50 characters'),
-    body('description')
-        .optional()
-        .trim()
-        .isLength({ max: 200 })
-        .withMessage('Description cannot exceed 200 characters'),
-    body('status')
-        .optional()
-        .isIn(['active', 'inactive'])
-        .withMessage('Status must be either active or inactive'),
-    body('image')
-        .optional()
-        .isURL()
-        .withMessage('Image must be a valid URL')
+    param('id').isMongoId().withMessage('Invalid category ID')
 ];
 
 const getCategoryByIdValidation = [
@@ -89,61 +51,10 @@ const deleteCategoryValidation = [
         .withMessage('hardDelete must be a boolean value')
 ];
 
-const getAllCategoriesValidation = [
-    query('page')
-        .optional()
-        .isInt({ min: 1 })
-        .withMessage('Page must be a positive integer'),
-    query('limit')
-        .optional()
-        .isInt({ min: 1, max: 100 })
-        .withMessage('Limit must be between 1 and 100'),
-    query('search')
-        .optional()
-        .trim()
-        .isLength({ min: 1, max: 50 })
-        .withMessage('Search term must be between 1 and 50 characters'),
-    query('status')
-        .optional()
-        .isIn(['active', 'inactive'])
-        .withMessage('Status must be either active or inactive'),
-    query('sortBy')
-        .optional()
-        .isIn(['name', 'created_at', 'updated_at', 'status'])
-        .withMessage('Invalid sort field'),
-    query('sortOrder')
-        .optional()
-        .isIn(['asc', 'desc'])
-        .withMessage('Sort order must be either asc or desc')
-];
+const getAllCategoriesValidation = [];
 
 const searchCategoriesValidation = [
-    query('q')
-        .trim()
-        .notEmpty()
-        .withMessage('Search query is required')
-        .isLength({ min: 1, max: 50 })
-        .withMessage('Search query must be between 1 and 50 characters'),
-    query('page')
-        .optional()
-        .isInt({ min: 1 })
-        .withMessage('Page must be a positive integer'),
-    query('limit')
-        .optional()
-        .isInt({ min: 1, max: 100 })
-        .withMessage('Limit must be between 1 and 100'),
-    query('status')
-        .optional()
-        .isIn(['active', 'inactive'])
-        .withMessage('Status must be either active or inactive'),
-    query('sortBy')
-        .optional()
-        .isIn(['name', 'created_at', 'updated_at', 'status'])
-        .withMessage('Invalid sort field'),
-    query('sortOrder')
-        .optional()
-        .isIn(['asc', 'desc'])
-        .withMessage('Sort order must be either asc or desc')
+    query('q').trim().notEmpty().withMessage('Search query is required')
 ];
 
 // Routes

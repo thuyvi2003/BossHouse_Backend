@@ -1,7 +1,7 @@
 const Product = require("../models/product.model.js");
 const ProductVariation = require("../models/productVariation.model.js");
 const Category = require("../models/category.model.js");
-const { uploadToCloudinary, deleteFromCloudinary } = require("./cloudinary.service.js");
+const { uploadToCloudinary, deleteFromCloudinary } = require("./cloudinary.services.js");
 
 // Create a new product
 const createProduct = async (productData, imageData) => {
