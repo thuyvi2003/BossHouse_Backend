@@ -2,6 +2,10 @@
 const Promotion = require('../models/promotion.model');
 const Cart = require('../models/cart.model')
 
+
+
+
+
 exports.createPromotion = async (promotionData) => {
     const promotion = await Promotion.create(promotionData);
     if (!promotion) {
@@ -9,14 +13,31 @@ exports.createPromotion = async (promotionData) => {
     } return promotion;
 }
 
-exports.getAllPromotionsAdmin = async () => {
-    const promotionsList = await Promotion.find();
-    return promotionsList;
+
+
+
+exports.getAllPromotionsAdmin = async (page, limit) => {
+    const skip = (page - 1) * limit;
+    const promotionsList = await Promotion.find()
+        .skip(skip)
+        .limit(limit);
+    const total = await Promotion.countDocuments();
+    return { promotionsList, total };
 }
 
-module.exports.getAllPromotionsUser = async (userId) => {
-    const promotionsList = await Promotion.find({ is_hidden: { $ne: true } });
 
+
+
+module.exports.getAllPromotionsUser = async (userId, page, limit) => {
+    const skip = (page - 1) * limit;
+    const promotionsList = await Promotion.find({ is_hidden: { $ne: true } })
+    skip(skip)
+        .limit(limit);
+
+    const total = await Promotion.countDocuments({ is_hidden: { $ne: true } })
+
+
+    //If have user then get userCart
     let userCart = null;
     if (userId) {
         userCart = await Cart.findOne({ user_id: userId });
@@ -50,6 +71,6 @@ module.exports.getAllPromotionsUser = async (userId) => {
         return promotionObj;
     });
 
-    return processedPromotions;
+    return { promotionsList: processedPromotions, total };
 };
 
