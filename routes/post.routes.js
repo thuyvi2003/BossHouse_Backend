@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/post.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+const protectRoute = require('../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -9,7 +9,7 @@ const fs = require('fs');
 const uploadsDir = path.join(__dirname, '../public/uploads');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    try { fs.mkdirSync(uploadsDir, { recursive: true }); } catch {}
+    try { fs.mkdirSync(uploadsDir, { recursive: true }); } catch { }
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
@@ -29,12 +29,12 @@ const upload = multer({ storage });
 // router.patch('/:id/featured', authMiddleware.protectRoute, authMiddleware.requireRoles(['admin']), postController.setFeaturedPost);
 
 // ==================== ADMIN ROUTES ====================
-router.post('/',  postController.createPost);
-router.put('/:id',  postController.updatePost);
-router.delete('/:id',  postController.deletePost);
-router.delete('/:id/permanent', postController.permanentDeletePost);
-router.patch('/:id/status', postController.changePostStatus);
-router.patch('/:id/featured', postController.setFeaturedPost);
+router.post('/', protectRoute(['admin']), postController.createPost);
+router.put('/:id', protectRoute(['admin']), postController.updatePost);
+router.delete('/:id', protectRoute(['admin']), postController.deletePost);
+router.delete('/:id/permanent', protectRoute(['admin']), postController.permanentDeletePost);
+router.patch('/:id/status', protectRoute(['admin']), postController.changePostStatus);
+router.patch('/:id/featured', protectRoute(['admin']), postController.setFeaturedPost);
 
 
 // ==================== PUBLIC ROUTES ====================
@@ -44,7 +44,7 @@ router.get('/filter', postController.filterPosts);
 router.get('/:id', postController.getPostById);
 
 // ==================== UPLOAD (LOCAL DISK) ====================
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload', protectRoute(['admin']), upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ status: 'error', message: 'No file uploaded' });
   const publicUrl = `/uploads/${req.file.filename}`;
   res.status(201).json({ status: 'success', url: publicUrl, filename: req.file.filename });
