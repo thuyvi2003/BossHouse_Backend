@@ -6,6 +6,13 @@ const mongoose = require('mongoose');
 const ProductVariation = require('../models/productVariation.model');
 
 exports.addToCart = async (userId, variationId, quantity) => {
+    let cart = await Cart.findOne({ user_id: userId });
+
+    const listCart = await CartItem.find({cart_id: cart._id })
+    if(listCart.length == 10 ) { 
+                return 0;
+
+    }
     //Check status variation
     const variation = await ProductVariation.findOne({
         _id: variationId,
@@ -20,7 +27,6 @@ exports.addToCart = async (userId, variationId, quantity) => {
     }
 
     //Check cart is exists or does not exists
-    let cart = await Cart.findOne({ user_id: userId });
     // If cart does not exists
     if (!cart) {
         cart = await Cart.create({ user_id: userId })
