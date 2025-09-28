@@ -3,7 +3,7 @@ const Product = require("../models/product.model.js");
 const {
   uploadToCloudinary,
   deleteFromCloudinary,
-} = require("./cloudinary.service.js");
+} = require("./cloudinary.services.js");
 
 // Create a new product variation
 const createProductVariation = async (productId, variationData, imageData) => {

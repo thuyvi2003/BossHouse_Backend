@@ -26,66 +26,16 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Validation rules
+// Validation rules - Simplified
 const createProductVariationValidation = [
   param("productId").isMongoId().withMessage("Invalid product ID"),
-  body("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Variation name is required")
-    .isLength({ min: 1, max: 100 })
-    .withMessage("Variation name must be between 1 and 100 characters"),
-  body("price")
-    .isFloat({ min: 0 })
-    .withMessage("Price must be a number greater than or equal to 0"),
-  body("stock")
-    .isInt({ min: 0 })
-    .withMessage("Stock must be a non-negative integer"),
-  body("color")
-    .optional()
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Color cannot exceed 50 characters"),
-  body("size")
-    .optional()
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Size cannot exceed 50 characters"),
-  body("status")
-    .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("Status must be either active or inactive"),
+  body("name").trim().notEmpty().withMessage("Variation name is required"),
+  body("price").isFloat({ min: 0 }).withMessage("Price must be a positive number"),
+  body("stock").isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
 ];
 
 const updateProductVariationValidation = [
   param("variationId").isMongoId().withMessage("Invalid variation ID"),
-  body("name")
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage("Variation name must be between 1 and 100 characters"),
-  body("price")
-    .optional()
-    .isFloat({ min: 0 })
-    .withMessage("Price must be a number greater than or equal to 0"),
-  body("stock")
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage("Stock must be a non-negative integer"),
-  body("color")
-    .optional()
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Color cannot exceed 50 characters"),
-  body("size")
-    .optional()
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Size cannot exceed 50 characters"),
-  body("status")
-    .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("Status must be either active or inactive"),
 ];
 
 const getProductVariationsValidation = [
@@ -104,9 +54,7 @@ const deleteProductVariationValidation = [
     .withMessage("hardDelete must be a boolean value"),
 ];
 
-const getVariationStatsValidation = [
-  query("productId").optional().isMongoId().withMessage("Invalid product ID"),
-];
+const getVariationStatsValidation = [];
 
 // Routes
 
