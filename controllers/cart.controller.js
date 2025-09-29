@@ -6,8 +6,7 @@ exports.addToCart = async (req, res, next) => {
         const userId = req.user._id;
         const { variation_id, quantity } = req.body;
         const cart = await cartService.addToCart(userId, variation_id, quantity);
-                if (cart == 0 ) res.status(400).json({code: 0})
-
+         if (cart == 0 ) res.status(400).json({code: 0})
         res.status(200).json({
             status: 'success',
             message: 'Add product to cart is successfully',
