@@ -9,8 +9,8 @@ exports.addToCart = async (userId, variationId, quantity) => {
     let cart = await Cart.findOne({ user_id: userId });
 
     const listCart = await CartItem.find({cart_id: cart._id })
-    if(listCart.length == 10 ) { 
-                return 0;
+    if(listCart.length == 5 ) { 
+    return 0;
 
     }
     //Check status variation
@@ -79,7 +79,6 @@ exports.editCartItemQuantity = async (userId, itemId, newQuantity) => {
     const cartItem = await CartItem.findOne({ _id: itemId, cart_id: cart._id });
     //CartItem does not exists
     if (!cartItem)  throw new Error("Cart item not found!");
-
     //CartItem exists
     const variation = await ProductVariation.findById(cartItem.variation_id);
     //Variation not found
