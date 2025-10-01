@@ -28,7 +28,7 @@ exports.getAllPromotionsAdmin = async (page, limit) => {
 
 
 
-module.exports.getAllPromotionsUser = async (userId, page, limit) => {
+exports.getAllPromotionsUser = async (userId, page, limit) => {
     const skip = (page - 1) * limit;
     const promotionsList = await Promotion.find({ is_hidden: { $ne: true } })
     skip(skip)
@@ -74,3 +74,26 @@ module.exports.getAllPromotionsUser = async (userId, page, limit) => {
     return { promotionsList: processedPromotions, total };
 };
 
+exports.getPromotionById  = async(promotionId) =>{
+    const promotion = await Promotion.findById(promotionId);
+    if(!promotion) throw new Error("Promotion not found")
+        return promotion;
+}
+
+exports.removePromotion = async (promotionId) =>{
+    const promotionDeleted = await Promotion.findByIdAndUpdate( promotionId, {is_hidden: true}, {new: true});
+    if(!promotionDeleted) throw new Error("Delete promotion failed!!");
+    return promotionDeleted;
+}
+
+exports.searchPromotion = async ({code, status}) => {
+    let filter = {};
+    if(code){
+        filter.code = {$regex: code, $options: 'i'}
+    }
+  if (status !== undefined && status !== "") {
+    filter.is_hidden = status === "true"; // "true" => true, "false" => false
+  }
+
+   return await Promotion.find(filter).sort({ createdAt: -1 });
+}

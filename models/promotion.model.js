@@ -36,6 +36,7 @@ const promotionSchema = new mongoose.Schema(
         expires_at: {
             type: Date,
         },
+      
     },
     {
         timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

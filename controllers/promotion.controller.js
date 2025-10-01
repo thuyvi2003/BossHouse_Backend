@@ -56,3 +56,48 @@ exports.getAllPromotionsUser = async (req, res, next) => {
         next(error);
     }
 }
+
+exports.getPromotionById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const promotion = await promotionService.getPromotionById(id);
+        res.status(200).json({
+            status: 'success',
+            message: 'Get promotion is successfully',
+            success: true,
+            data: promotion
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+exports.removePromotion = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const promotionDeleted = await promotionService.removePromotion(id);
+        res.status(200).json({
+            status: 'success',
+            message: 'Remove promotion is successfully',
+            success: true,
+            data: promotionDeleted
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+exports.searchPromotion = async (req, res, next) => {
+    try {
+        const { code, status } = req.query;
+        const promotions = await promotionService.searchPromotion({ code, status })
+        res.status(200).json(
+            {
+                status: 'success',
+                message: 'Success',
+                success: true,
+                data: promotions
+            }
+        );
+    } catch (error) {
+        next(error);
+    }
+}
