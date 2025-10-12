@@ -4,7 +4,8 @@ const Service = require("../models/service.model");
 
 const toObjectId = (id) => {
   if (!id) return null;
-  if (mongoose.Types.ObjectId.isValid(id)) return new mongoose.Types.ObjectId(id);
+  if (mongoose.Types.ObjectId.isValid(id))
+    return new mongoose.Types.ObjectId(id);
   throw new Error("Invalid ObjectId: " + id);
 };
 
@@ -12,7 +13,8 @@ const toObjectId = (id) => {
 exports.createBooking = async (data) => {
   data.user_id = toObjectId(data.user_id);
   data.pet_id = toObjectId(data.pet_id);
-  if (data.veterinarian_id) data.veterinarian_id = toObjectId(data.veterinarian_id);
+  if (data.veterinarian_id)
+    data.veterinarian_id = toObjectId(data.veterinarian_id);
 
   if (!data.services || !data.services.length)
     throw new Error("At least one service required");
@@ -25,7 +27,11 @@ exports.createBooking = async (data) => {
       const service = await Service.findById(sid);
       if (!service) throw new Error("Service not found: " + s.service_id);
       total += service.base_price * (s.quantity || 1);
-      return { service_id: sid, quantity: s.quantity || 1, base_price: service.base_price };
+      return {
+        service_id: sid,
+        quantity: s.quantity || 1,
+        base_price: service.base_price,
+      };
     })
   );
   data.total_price = total;
@@ -55,7 +61,11 @@ exports.updateBooking = async (id, data) => {
         const service = await Service.findById(sid);
         if (!service) throw new Error("Service not found: " + s.service_id);
         total += service.base_price * (s.quantity || 1);
-        return { service_id: sid, quantity: s.quantity || 1, base_price: service.base_price };
+        return {
+          service_id: sid,
+          quantity: s.quantity || 1,
+          base_price: service.base_price,
+        };
       })
     );
     data.total_price = total;
@@ -83,4 +93,13 @@ exports.searchBooking = async (q) =>
 exports.filterBooking = async (status) =>
   Booking.find({ status })
     .populate("user_id pet_id veterinarian_id")
+    .populate("services.service_id");
+
+exports.getBookingsByUser = async (userId) =>
+  Booking.find({ user_id: userId })
+    .populate("user_id pet_id")
+    .populate({
+      path: "veterinarian_id",
+      populate: { path: "user_id", select: "name" } // <-- populate nested user info
+    })
     .populate("services.service_id");

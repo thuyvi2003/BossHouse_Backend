@@ -17,6 +17,13 @@ router.get(
   bookingController.getAllBookings
 );
 
+// GET MY BOOKINGS
+router.get(
+  "/my-bookings",
+  protectRoute(["user", "admin", "staff", "veterinarian"]),
+  bookingController.getMyBookings
+);
+
 // VIEW BOOKING DETAIL
 router.get(
   "/:id",
@@ -52,4 +59,9 @@ router.get(
   bookingController.filterBooking
 );
 
+router.delete(
+  "/:id",
+  protectRoute(["admin", "staff", "user"]),
+  bookingController.deleteBooking
+);
 module.exports = router;

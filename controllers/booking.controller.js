@@ -72,3 +72,13 @@ exports.filterBooking = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+exports.getMyBookings = async (req, res) => {
+  try {
+    const userId = req.user._id; // req.user được protectRoute gắn
+    const bookings = await bookingService.getBookingsByUser(userId);
+    res.json({ success: true, data: bookings });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
