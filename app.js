@@ -20,6 +20,7 @@ const petRouter = require("./routes/pet.routes");
 const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
 const postRouter = require("./routes/post.routes");
+const contactRouter = require("./routes/contact.routes");
 
 const app = express();
 
@@ -43,6 +44,7 @@ require("./models/booking.model");
 require("./models/category.model");
 require("./models/product.model");
 require("./models/productVariation.model");
+require("./models/contact.model")
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -70,6 +72,8 @@ app.use("/api/pets", petRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/contacts", contactRouter);
+app.use("/uploads", express.static('uploads'));
 
 // Catch 404
 app.use(function (req, res, next) {
