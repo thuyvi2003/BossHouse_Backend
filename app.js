@@ -21,12 +21,15 @@ const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
 const postRouter = require("./routes/post.routes");
 const contactRouter = require("./routes/contact.routes");
+const reviewRouter = require("./routes/review.routes");
+const notificationRouter = require("./routes/notification.routes");
 
 const app = express();
 
 // Connect to MongoDB
+const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/bosshouse";
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(mongoUri)
   .then(() => {
     console.log("🌟🔮 MongoDB Ready to Serve 🍀⚡");
   })
@@ -34,7 +37,7 @@ mongoose
     console.error("❌ Error connecting to MongoDB", err);
   });
 
-// (giữ nếu dự án có các model)
+// Models
 require("./models/user.model");
 require("./models/pet.model");
 require("./models/service.model");
@@ -44,7 +47,9 @@ require("./models/booking.model");
 require("./models/category.model");
 require("./models/product.model");
 require("./models/productVariation.model");
-require("./models/contact.model")
+require("./models/contact.model");
+require("./models/review.model");
+require("./models/reviewReply.model");
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -73,7 +78,8 @@ app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/contacts", contactRouter);
-app.use("/uploads", express.static('uploads'));
+app.use("/api/reviews", reviewRouter);
+app.use("/api/notifications", notificationRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
