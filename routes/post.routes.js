@@ -41,6 +41,7 @@ router.patch('/:id/featured', protectRoute(['admin']), postController.setFeature
 router.get('/', postController.getAllPosts);
 router.get('/search', postController.searchPosts);
 router.get('/filter', postController.filterPosts);
+router.get('/admin/filter', protectRoute(['admin']), postController.filterPosts);
 router.get('/:id', postController.getPostById);
 
 // ==================== UPLOAD (LOCAL DISK) ====================

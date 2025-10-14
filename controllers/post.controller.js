@@ -55,7 +55,16 @@ exports.filterPosts = async (req, res, next) => {
             skip: parseInt(req.query.skip) || 0
         };
         
-        const result = await postService.getAllPostsUser(filters);
+        // Check if user is admin to determine role
+        const isAdmin = req.user && (req.user.role === 'admin' || req.user.role === 'Admin');
+        const role = isAdmin ? 'admin' : 'user';
+        
+        console.log('filterPosts - User:', req.user);
+        console.log('filterPosts - IsAdmin:', isAdmin);
+        console.log('filterPosts - Role:', role);
+        console.log('filterPosts - Filters:', filters);
+        
+        const result = await postService.getAllPosts(filters, role);
         
         res.status(200).json({
             status: 'success',

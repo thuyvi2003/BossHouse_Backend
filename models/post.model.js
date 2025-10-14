@@ -27,8 +27,9 @@ const postSchema = new mongoose.Schema(
         },
         image: {
             type: String,
-            required: true,
+            required: false,
             trim: true,
+            default: "",
         },
         // Thêm các trường bổ sung có thể hữu ích
         category: {
