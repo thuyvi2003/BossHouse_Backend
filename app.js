@@ -20,6 +20,7 @@ const petRouter = require("./routes/pet.routes");
 const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
 const postRouter = require("./routes/post.routes");
+const wishlistRouter = require("./routes/wishlist.routes");
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use("/api/pets", petRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/wishlists",wishlistRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
