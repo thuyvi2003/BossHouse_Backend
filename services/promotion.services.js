@@ -147,6 +147,7 @@ exports.applyPromotion = async (userId, promotionId) => {
             path: "items",
             populate: { path: "variation_id" },
         });
+        return updatedCart;
 }
 
 
