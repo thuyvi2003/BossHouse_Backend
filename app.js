@@ -29,7 +29,7 @@ const app = express();
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/bosshouse";
 mongoose
-  .connect(mongoUri)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("🌟🔮 MongoDB Ready to Serve 🍀⚡");
   })
