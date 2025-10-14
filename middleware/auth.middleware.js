@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 
 const protectRoute = (requiredRoles) => async (req, res, next) => {
+
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -23,6 +24,7 @@ const protectRoute = (requiredRoles) => async (req, res, next) => {
 
     // Check if user has one of the required roles (if specified)
     // Now, requiredRoles can be a string or an array of strings
+    console.log(requiredRoles)
     if (requiredRoles) {
       const rolesArray = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
       if (!rolesArray.includes(user.role)) {

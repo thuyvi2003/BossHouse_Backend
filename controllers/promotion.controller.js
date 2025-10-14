@@ -101,3 +101,71 @@ exports.searchPromotion = async (req, res, next) => {
         next(error);
     }
 }
+exports.getAvailablePromotion = async (req, res, next) => {
+    try {
+        const userId = req.user?._id || req.body.user_id;
+        const result = await promotionService.getAvailablePromotion(userId);
+        res.status(200).json({
+            status: 'success',
+            message: "Available promotions fetched successfully",
+            success: 'true',
+            data: result,
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.applyPromotion = async (req, res, next) => {
+    try {
+        const { promotion_id } = req.body;
+        const userId = req.user._id;
+
+        if (!promotion_id)
+            return res.status(400).json({ message: "promotion_id is required" });
+
+        const result = await promotionService.applyPromotion(userId, promotion_id);
+
+        return res.status(200).json({
+            message: "Promotion applied successfully",
+            data: result,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: "Failed to apply promotion",
+            error: error.message,
+        });
+    }
+};
+
+exports.claimPromotion = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const { id } = req.params;
+
+        const data = await promotionService.claimPromotion(userId, id);
+        res.status(201).json({
+            success: true,
+            status: "success",
+            message: "Promotion claimed successfully",
+            data,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getUserClaimedPromotions = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const data = await promotionService.getUserClaimedPromotions(userId);
+        res.status(200).json({
+            message: "Claimed promotions fetched successfully",
+            data,
+        });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || "Failed to fetch claimed promotions",
+        });
+    }
+};
