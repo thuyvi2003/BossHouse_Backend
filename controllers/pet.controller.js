@@ -8,3 +8,13 @@ exports.getAllPets = async (req, res) => {
     res.status(500).json({ status: "error", message: err.message });
   }
 };
+
+exports.createPet = async (req, res) => {
+  try {
+    const { name, species, user_id } = req.body;
+    const newPet = await Pet.create({ name, species, user_id });
+    res.status(201).json({ status: "success", data: newPet });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: err.message });
+  }
+};
