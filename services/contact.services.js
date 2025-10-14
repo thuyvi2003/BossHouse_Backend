@@ -13,7 +13,6 @@ const contactService = {
     return await Contact.find(filter)
       .populate("createdBy", "name email role")
       .populate("responses.createdBy", "name email role")
-      .sort({ createdAt: -1 }) // 🔹 Sắp xếp mới nhất lên đầu
       .lean();
   },
 
@@ -58,7 +57,6 @@ const contactService = {
       ],
     })
       .populate("createdBy", "name email")
-      .sort({ createdAt: -1 }) // 🔹 Sắp xếp theo thời gian mới nhất
       .lean();
   },
 };
