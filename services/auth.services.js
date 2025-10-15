@@ -76,6 +76,11 @@ const loginService = async (email, password) => {
         throw new Error("Invalid email or password!");
     }
 
+    // check if account is deleted
+    if (user.is_deleted) {
+        throw new Error("This account has been deleted!");
+    }
+
     // check if password is correct
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
