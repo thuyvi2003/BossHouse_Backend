@@ -18,11 +18,19 @@ exports.addToWishlist = async (req, res, next) => {
 exports.getWishlist = async (req, res, next) => {
     try {
         const user_id = req.user._id;
-        const wishlist = await wishlistService.getWishlist(user_id);
-        res.status(201).json({
-            status: 'success',
-            message: 'Get wishlist is successfully',
-            data: wishlist
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const { wishlist, total } = await wishlistService.getWishlist(user_id);
+        res.status(200).json({
+            status: "success",
+            message: "Get wishlist successfully",
+            data: wishlist,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
         });
     } catch (error) {
         next(error)
