@@ -20,6 +20,7 @@ exports.createPromotion = async (promotionData) => {
 exports.getAllPromotionsAdmin = async (page, limit) => {
     const skip = (page - 1) * limit;
     const promotionsList = await Promotion.find()
+        .sort({created_at: -1})
         .skip(skip)
         .limit(limit);
     const total = await Promotion.countDocuments();
@@ -29,7 +30,7 @@ exports.getAllPromotionsAdmin = async (page, limit) => {
 exports.getAllPromotionsUser = async (userId, page, limit) => {
     const skip = (page - 1) * limit;
     const promotionsList = await Promotion.find({ is_hidden: { $ne: true } })
-    skip(skip)
+        .skip(skip)
         .limit(limit);
 
     const total = await Promotion.countDocuments({ is_hidden: { $ne: true } })
@@ -105,11 +106,11 @@ exports.getAvailablePromotion = async (userId) => {
     const promotions = await Promotion.find({
         is_hidden: false,
         $and: [
-            //Loc dieu kien 
             { $or: [{ expires_at: null }, { expires_at: { $gt: new Date() } }] },
             { $or: [{ max_uses: null }, { $expr: { $lt: ["$used_count", "$max_uses"] } }] },
         ],
-    });
+    })
+    .sort({created_at: -1})
 
     // Lọc tiếp theo điều kiện min cart (ví dụ > 100000)
     const available = promotions.filter((p) => {
