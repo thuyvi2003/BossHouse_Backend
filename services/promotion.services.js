@@ -86,6 +86,24 @@ exports.removePromotion = async (promotionId) => {
     return promotionDeleted;
 }
 
+
+exports.editPromotion = async (promotionId,updateData) => {
+    try {
+        const updatedPromotion = await Promotion.findByIdAndUpdate(
+            promotionId,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedPromotion) {
+            throw new Error("Promotion not found");
+        }
+
+        return updatedPromotion;
+    } catch (error) {
+        throw error;
+    }
+}
 exports.searchPromotion = async ({ code, status }) => {
     let filter = {};
     if (code) {
