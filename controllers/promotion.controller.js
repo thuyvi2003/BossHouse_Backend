@@ -85,6 +85,28 @@ exports.removePromotion = async (req, res, next) => {
         next(error);
     }
 }
+
+exports.updatePromotion = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        const updatedPromotion = await promotionService.editPromotion(id, updateData);
+
+        return res.status(200).json({
+            success: true,
+            message: "Promotion updated successfully",
+            data: updatedPromotion,
+        });
+    } catch (error) {
+        console.error("Error updating promotion:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to update promotion",
+        });
+    }
+};
+
 exports.searchPromotion = async (req, res, next) => {
     try {
         const { code, status } = req.query;
