@@ -50,4 +50,35 @@ const deleteAccountService = async (userId) => {
     return { success: true, message: "Account has been deleted!" };
 };
 
-module.exports = { changePasswordService, deleteAccountService };
+const getLoginHistoryService = async (userId, page = 1, limit = 10) => {
+    const user = await User.findById(userId).select("login_history");
+    if (!user) {
+        throw new Error("User not found!");
+    }
+
+    const totalItems = user.login_history.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const skip = (page - 1) * limit;
+
+    // Sort by login_time in descending order (newest first)
+    const loginHistory = user.login_history
+        .sort((a, b) => b.login_time - a.login_time)
+        .slice(skip, skip + limit)
+        .map((entry, index) => ({
+            id: `${userId}-${skip + index}`, // Unique ID for frontend
+            loginTime: entry.login_time,
+            loginType: entry.login_type,
+        }));
+
+    return {
+        loginHistory,
+        pagination: {
+            currentPage: page,
+            totalPages,
+            totalItems,
+            itemsPerPage: limit,
+        },
+    };
+};
+
+module.exports = { changePasswordService, deleteAccountService, getLoginHistoryService };
