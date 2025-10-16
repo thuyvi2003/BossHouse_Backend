@@ -312,8 +312,8 @@ const googleLoginService = async (idToken) => {
             },
         };
     } catch (error) {
-        console.error("Google login error:", error);
-        throw new Error("Failed to authenticate with Google!");
+        console.error("Google login error:", error.message);
+        throw error; // Rethrow the specific error to preserve the message
     }
 };
 
