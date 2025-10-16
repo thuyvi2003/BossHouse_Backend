@@ -20,7 +20,7 @@ exports.createPromotion = async (promotionData) => {
 exports.getAllPromotionsAdmin = async (page, limit) => {
     const skip = (page - 1) * limit;
     const promotionsList = await Promotion.find()
-        .sort({created_at: -1})
+        .sort({ created_at: -1 })
         .skip(skip)
         .limit(limit);
     const total = await Promotion.countDocuments();
@@ -98,11 +98,6 @@ exports.searchPromotion = async ({ code, status }) => {
     return await Promotion.find(filter).sort({ createdAt: -1 });
 }
 exports.getAvailablePromotion = async (userId) => {
-    //Get user cart
-    const cart = await Cart.findOne({ user_id: userId });
-    if (!cart) throw new Error("Cart not found");
-
-    const total = cart.original_price || 0;
     const promotions = await Promotion.find({
         is_hidden: false,
         $and: [
@@ -110,13 +105,14 @@ exports.getAvailablePromotion = async (userId) => {
             { $or: [{ max_uses: null }, { $expr: { $lt: ["$used_count", "$max_uses"] } }] },
         ],
     })
-    .sort({created_at: -1})
-
-    // Lọc tiếp theo điều kiện min cart (ví dụ > 100000)
+        .sort({ created_at: -1 })
+    //Filter promotion user claimed 
+    const claimed = await UserPromotion.find({ user_id: userId }).select("promotion_id")
+    const claimedIds = claimed.map(c => { c.promotion_id.toString() })
     const available = promotions.filter((p) => {
-        return !p.minimum_cart_value || total >= p.minimum_cart_value;
+        return !claimedIds.includes(p._id.toString());
     });
-    return { total, promotions: available };
+    return available;
 }
 exports.applyPromotion = async (userId, promotionId) => {
     const cart = await Cart.findOne({ user_id: userId });
@@ -148,7 +144,7 @@ exports.applyPromotion = async (userId, promotionId) => {
             path: "items",
             populate: { path: "variation_id" },
         });
-        return updatedCart;
+    return updatedCart;
 }
 
 
@@ -178,7 +174,7 @@ exports.claimPromotion = async (userId, promotionId) => {
         is_used: false,
     });
     const populated = await UserPromotion.findById(created._id)
-        .populate({ path: "promotion_id" }) 
+        .populate({ path: "promotion_id" })
         .populate({ path: "user_id", select: "name email role" })
         .lean(); // trả về plain object (nhẹ hơn)
 
