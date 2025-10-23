@@ -10,6 +10,7 @@ const cors = require("cors");
 // Routers
 const promotionRouter = require("./routes/promotion.routes");
 const authRouter = require("./routes/auth.routes");
+const profileRouter = require("./routes/profile.routes");
 const cartRouter = require("./routes/cart.routes");
 const bookingRouter = require("./routes/booking.routes");
 const categoryRouter = require("./routes/category.routes");
@@ -67,6 +68,7 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // API Routes
 app.use("/api/auth", authRouter);
+app.use("/api/profile", profileRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/bookings", bookingRouter);
@@ -78,7 +80,7 @@ app.use("/api/pets", petRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
-app.use("/api/wishlists",wishlistRouter);
+app.use("/api/wishlists", wishlistRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
