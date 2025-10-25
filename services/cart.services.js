@@ -7,12 +7,13 @@ const ProductVariation = require('../models/productVariation.model');
 
 exports.addToCart = async (userId, variationId, quantity) => {
     let cart = await Cart.findOne({ user_id: userId });
-
-    const listCart = await CartItem.find({cart_id: cart._id })
+    if (cart) { 
+          const listCart = await CartItem.find({cart_id: cart._id })
     if(listCart.length == 5 ) { 
     return 0;
-
     }
+    }
+  
     //Check status variation
     const variation = await ProductVariation.findOne({
         _id: variationId,
@@ -20,12 +21,10 @@ exports.addToCart = async (userId, variationId, quantity) => {
         isDeleted: false
     });
     if (!variation) throw new Error("Variation not found or inactive");
-
     //Check stock of variation
     if (variation.stock < quantity) {
         throw new Error(`Not enough stock. Only ${variation.stock} left`);
     }
-
     //Check cart is exists or does not exists
     // If cart does not exists
     if (!cart) {

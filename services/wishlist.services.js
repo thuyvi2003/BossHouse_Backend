@@ -1,5 +1,7 @@
 //Vo Lam Thuy Vi
+const Cart = require("../models/cart.model");
 const Wishlist = require("../models/wishlist.model");
+const wishlistGroup = require("../models/wishlistGroup.model");
 
 exports.addToWishlist = async (userId, productVariationId, note) => {
   try {
@@ -26,6 +28,8 @@ exports.addToWishlist = async (userId, productVariationId, note) => {
     throw error;
   }
 }
+
+
 exports.getWishlist = async (userId, page, limit) => {
   const skip = (page - 1) * limit;
   const wishlist = await Wishlist.find({ user_id: userId })
@@ -40,3 +44,119 @@ exports.getWishlist = async (userId, page, limit) => {
   return { wishlist, total };
 }
 
+
+
+exports.removeWishlistItem = async (userId, itemId) => {
+  console.log("")
+  const itemDeleted = await Wishlist.findOneAndDelete({
+    _id: itemId,
+    user_id: userId,
+  });
+  if (!itemDeleted) throw new Error("Item not found or already removed!");
+  return itemDeleted;
+};
+
+
+exports.clearAllWishlist = async (userId, groupId = null) => {
+  const filter = { user_id: userId };
+  if (groupId) filter.group_id = groupId;
+  const result = await Wishlist.deleteMany(filter);
+  return result;
+}
+
+
+exports.moveToCart = async (userId, itemId) => {
+  const item = await Wishlist.findOne({ _id: itemId, user_id: userId });
+  if (!item) throw new Error("Wishlist item not found");
+  await Cart.create({
+    user_id: userId,
+    product_variation_id: item.product_variation_id,
+    quantity: 1,
+  });
+  item.status = "moved_to_cart";
+  await item.save();
+  return { success: true, message: "Moved to cart", data: item };
+
+}
+
+
+
+// Group wishlist area
+exports.createGroup = async (userId, name, description) => {
+  const group = await wishlistGroup.create({
+    user_id: userId,
+    name,
+    description
+  });
+  return group;
+}
+
+exports.moveToGroup = async (userId, itemId, newGroupId) => {
+  const item = await Wishlist.findOneAndUpdate(
+    { _id: itemId, user_id: userId },
+    { group_id: newGroupId }, //Thay doi thanh object _id cua group do
+    { new: true }).populate("group_id");
+  if (!item) throw new Error("Item not found");
+  return item;
+}
+
+
+exports.getGroup = async (userId) => {
+  const groups = await wishlistGroup.find({ user_id: userId })
+    .populate({
+      path: 'items',
+      populate: {
+        path: 'product_variation_id',
+        populate: { path: 'product_id' },
+      },
+    })
+    .sort({ created_at: -1 });
+
+  return groups;
+};
+
+
+
+
+exports.shareWishlistGroup = async (userId, groupId, visibility = 'public') => {
+  const shareToken = crypto.randomBytes(16).toString('Hex'); //Create randomToken
+
+  const group = await wishlistGroup.findOneAndUpdate(
+    { _id: groupId, user_id: userId },
+    {
+      is_shared: true,
+      visibility,
+      share_token: shareToken
+    },
+    { new: true }
+  );
+  if (!group) throw new Error('Group not found');
+  return group;
+}
+
+exports.getSharedWishlist = async (shareToken) => {
+  const group = await wishlistGroup.findOne({
+    share_token: shareToken,
+    is_shared: true,
+  });
+
+  if (!group) throw new Error('Shared wishlist not found or disabled');
+
+  const items = await Wishlist.find({
+    group_id: group._id,
+    status: { $ne: 'removed' },
+  }).populate({
+    path: 'product_variation_id',
+    populate: { path: 'product_id' },
+  });
+  return items;
+}
+
+exports.disableShare = async (userId, groupId) => {
+  const group = await wishlistGroup.findOneAndUpdate({
+    _id: groupId, user_id: userId
+  },
+    { is_shared: false, share_token: null },
+    { new: true })
+  return group;
+}

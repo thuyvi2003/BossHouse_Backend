@@ -25,6 +25,7 @@ const wishlistRouter = require("./routes/wishlist.routes");
 const contactRouter = require("./routes/contact.routes");
 const reviewRouter = require("./routes/review.routes");
 const notificationRouter = require("./routes/notification.routes");
+const orderRouter = require("./routes/order.routes")
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use("/api/wishlists", wishlistRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/orders", orderRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
