@@ -1,5 +1,6 @@
 //Vo Lam Thuy Vi
 const Cart = require("../models/cart.model");
+const CartItem = require("../models/cartItem.model");
 const Wishlist = require("../models/wishlist.model");
 const wishlistGroup = require("../models/wishlistGroup.model");
 
@@ -68,14 +69,26 @@ exports.clearAllWishlist = async (userId, groupId = null) => {
 exports.moveToCart = async (userId, itemId) => {
   const item = await Wishlist.findOne({ _id: itemId, user_id: userId });
   if (!item) throw new Error("Wishlist item not found");
-  await Cart.create({
-    user_id: userId,
-    product_variation_id: item.product_variation_id,
-    quantity: 1,
+   let cart = await Cart.findOne({ user_id: userId });
+  if (!cart) cart = await Cart.create({ user_id: userId });
+  //Tim xem item nay da co trong cart roi chua
+ let cartItem = await CartItem.findOne({
+    cart_id: cart._id,
+    variation_id: item.product_variation_id,
   });
-  item.status = "moved_to_cart";
-  await item.save();
-  return { success: true, message: "Moved to cart", data: item };
+  //Neu co roi thi tang quantity len
+   if (cartItem) {
+    cartItem.quantity += 1;
+    await cartItem.save();
+  } else { //Chua co thi create new Cart
+    await CartItem.create({
+      cart_id: cart._id,
+      variation_id: item.product_variation_id,
+      quantity: 1,
+    });
+  }
+  await Wishlist.findByIdAndDelete(item._id);
+  return {  success: true, message: "Item moved to cart successfully" };
 
 }
 
