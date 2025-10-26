@@ -14,7 +14,7 @@ router.patch('/:id/move-to-group', protectRoute(['user', 'veterinarian']), wishl
 // Wishlist groups
 router.get('/groups', protectRoute(['user', 'veterinarian']), wishlistController.getGroups);
 router.post('/groups/create', protectRoute(['user', 'veterinarian']), wishlistController.createGroup);
-router.post('/groups/:groupId/share', protectRoute(['user', 'veterinarian']), wishlistController.shareWishlistGroup);
-router.patch('/groups/:groupId/unshare', protectRoute(['user', 'veterinarian'], wishlistController.disableShare));
+router.post('/share/:groupId', protectRoute(['user', 'veterinarian']), wishlistController.shareWishlistGroup);
+router.get('/shared/:groupId', wishlistController.getSharedWishlistGroup);
 
 module.exports = router;

@@ -105,13 +105,22 @@ exports.createGroup = async (userId, name, description) => {
 }
 
 exports.moveToGroup = async (userId, itemId, newGroupId) => {
-  const item = await Wishlist.findOneAndUpdate(
-    { _id: itemId, user_id: userId },
-    { group_id: newGroupId }, //Thay doi thanh object _id cua group do
-    { new: true }).populate("group_id");
+  const item = await Wishlist.findOne({ _id: itemId, user_id: userId });
   if (!item) throw new Error("Item not found");
-  return item;
-}
+
+  if (item.group_id && item.group_id.toString() === newGroupId) {
+    throw new Error("This item already belongs to the selected group.");
+  }
+
+  const updatedItem = await Wishlist.findOneAndUpdate(
+    { _id: itemId, user_id: userId },
+    { group_id: newGroupId },
+    { new: true }
+  ).populate("group_id");
+
+  return updatedItem;
+};
+
 
 
 exports.getGroup = async (userId) => {
@@ -132,14 +141,13 @@ exports.getGroup = async (userId) => {
 
 
 exports.shareWishlistGroup = async (userId, groupId, visibility = 'public') => {
-  const shareToken = crypto.randomBytes(16).toString('Hex'); //Create randomToken
 
   const group = await wishlistGroup.findOneAndUpdate(
     { _id: groupId, user_id: userId },
     {
       is_shared: true,
       visibility,
-      share_token: shareToken
+      share_token: groupId
     },
     { new: true }
   );
@@ -147,23 +155,21 @@ exports.shareWishlistGroup = async (userId, groupId, visibility = 'public') => {
   return group;
 }
 
-exports.getSharedWishlist = async (shareToken) => {
-  const group = await wishlistGroup.findOne({
-    share_token: shareToken,
-    is_shared: true,
-  });
+exports.getSharedWishlistGroup = async (groupId) => {
+  const group = await wishlistGroup
+    .findOne({ _id: groupId, is_shared: true, visibility: 'public' })
+    .populate({
+      path: 'items',
+      populate: {
+        path: 'product_variation_id',
+        populate: 'product_id',
+      },
+    })
+    .populate('user_id', 'profile_image'); 
 
-  if (!group) throw new Error('Shared wishlist not found or disabled');
-
-  const items = await Wishlist.find({
-    group_id: group._id,
-    status: { $ne: 'removed' },
-  }).populate({
-    path: 'product_variation_id',
-    populate: { path: 'product_id' },
-  });
-  return items;
-}
+  if (!group) throw new Error('This wishlist group is not shared or does not exist.');
+  return group;
+};
 
 exports.disableShare = async (userId, groupId) => {
   const group = await wishlistGroup.findOneAndUpdate({
