@@ -98,9 +98,9 @@ exports.moveToGroup = async (req, res) => {
     try {
         const userId = req.user._id;
         const { id } = req.params;
-        const { group_id } = req.body;
-        console.log("Group_id", group_id)
-        const result = await wishlistService.moveToGroup(userId, id, group_id);
+        const { newGroupId } = req.body;
+        console.log("Group_id", newGroupId)
+        const result = await wishlistService.moveToGroup(userId, id, newGroupId);
         res.json({
             success: true,
             status: "success",
@@ -157,7 +157,7 @@ exports.shareWishlistGroup = async (req, res) => {
         const { groupId } = req.params;
         const { visibility = 'public' } = req.body;
         const group = await wishlistService.shareWishlistGroup(userId, groupId, visibility);
-        const shareUrl = `https://yourapp.com/share/wishlist/${group.share_token}`;
+        const shareUrl = `http://localhost:5173/share/wishlist/${group._id}`;
         res.json({
             success: true,
             message: 'Wishlist shared successfully',
@@ -169,21 +169,21 @@ exports.shareWishlistGroup = async (req, res) => {
     }
 };
 
-exports.getSharedWishlist = async (req, res) => {
-    try {
-        const { shareToken } = req.params;
-        const items = await wishlistService.getSharedWishlist(shareToken);
-        res.json({
-            success: true,
-            data: items
-        });
-    } catch (err) {
-        res.status(404).json({
-            success: false,
-            message: err.message
-        });
-    }
+exports.getSharedWishlistGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const group = await wishlistService.getSharedWishlistGroup(groupId);
+
+    res.json({
+      success: true,
+      message: 'Shared wishlist retrieved successfully',
+      data: group,
+    });
+  } catch (err) {
+    res.status(404).json({ success: false, message: err.message });
+  }
 };
+
 exports.disableShare = async (req, res) => {
     try {
         const userId = req.user._id;
