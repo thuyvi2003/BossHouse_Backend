@@ -18,6 +18,9 @@ exports.getAllPosts = async (filters = {}, role = 'user') => {
     try {
         const query = {};
 
+        console.log('getAllPosts - Role:', role);
+        console.log('getAllPosts - Filters:', filters);
+
         if (role === 'admin') {
             // Admin có thể filter tất cả
             if (filters.status) query.status = filters.status;
@@ -34,6 +37,8 @@ exports.getAllPosts = async (filters = {}, role = 'user') => {
             if (filters.is_featured !== undefined) query.is_featured = filters.is_featured;
         }
 
+        console.log('getAllPosts - Final query:', query);
+
         const limit = filters.limit || (role === 'admin' ? 50 : 20);
         const skip = filters.skip || 0;
 
@@ -46,6 +51,9 @@ exports.getAllPosts = async (filters = {}, role = 'user') => {
             .skip(skip);
 
         const total = await Post.countDocuments(query);
+
+        console.log('getAllPosts - Found posts:', posts.length);
+        console.log('getAllPosts - Posts statuses:', posts.map(p => ({ id: p._id, status: p.status, title: p.title })));
 
         return {
             posts,

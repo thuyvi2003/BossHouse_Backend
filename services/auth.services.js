@@ -76,11 +76,23 @@ const loginService = async (email, password) => {
         throw new Error("Invalid email or password!");
     }
 
+    // check if account is deleted
+    if (user.is_deleted) {
+        throw new Error("This account has been deleted!");
+    }
+
     // check if password is correct
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
         throw new Error("Invalid email or password!");
     }
+
+    // Log login event
+    user.login_history.push({
+        login_time: new Date(),
+        login_type: "email",
+    });
+    await user.save();
 
     const token = generateToken(user._id);
 
@@ -255,6 +267,11 @@ const googleLoginService = async (idToken) => {
             ]
         });
 
+        // Check if account is deleted
+        if (user && user.is_deleted) {
+            throw new Error("This account has been deleted!");
+        }
+
         if (!user) {
             // Create new user with Google data
             user = new User({
@@ -269,11 +286,16 @@ const googleLoginService = async (idToken) => {
             await user.save();
         } else if (!user.google_id) {
             // User exists with email but not linked to Google
-            // Update to link with Google
-            user.google_id = googleId;
-            user.profile_image = picture || user.profile_image;
-            await user.save();
+            // Prevent login and throw a custom error instead of linking
+            throw new Error("Social login is not linked to any account.");
         }
+
+        // Log login event
+        user.login_history.push({
+            login_time: new Date(),
+            login_type: "google",
+        });
+        await user.save();
 
         // Generate JWT token
         const token = generateToken(user._id);
@@ -290,8 +312,8 @@ const googleLoginService = async (idToken) => {
             },
         };
     } catch (error) {
-        console.error("Google login error:", error);
-        throw new Error("Failed to authenticate with Google!");
+        console.error("Google login error:", error.message);
+        throw error; // Rethrow the specific error to preserve the message
     }
 };
 

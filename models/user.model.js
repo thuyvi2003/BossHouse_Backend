@@ -42,6 +42,19 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        login_history: [
+            {
+                login_time: {
+                    type: Date,
+                    default: Date.now,
+                },
+                login_type: {
+                    type: String,
+                    enum: ["email", "google"],
+                    required: true,
+                },
+            },
+        ],
     },
     {
         timestamps: {

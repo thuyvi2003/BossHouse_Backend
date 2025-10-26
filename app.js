@@ -10,6 +10,7 @@ const cors = require("cors");
 // Routers
 const promotionRouter = require("./routes/promotion.routes");
 const authRouter = require("./routes/auth.routes");
+const profileRouter = require("./routes/profile.routes");
 const cartRouter = require("./routes/cart.routes");
 const bookingRouter = require("./routes/booking.routes");
 const categoryRouter = require("./routes/category.routes");
@@ -20,12 +21,17 @@ const petRouter = require("./routes/pet.routes");
 const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
 const postRouter = require("./routes/post.routes");
+const wishlistRouter = require("./routes/wishlist.routes");
 const contactRouter = require("./routes/contact.routes");
 const scheduleRouter = require("./routes/vetSchdule.routes");
+const reviewRouter = require("./routes/review.routes");
+const notificationRouter = require("./routes/notification.routes");
+const orderRouter = require("./routes/order.routes")
 
 const app = express();
 
 // Connect to MongoDB
+const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/bosshouse";
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
@@ -35,7 +41,7 @@ mongoose
     console.error("❌ Error connecting to MongoDB", err);
   });
 
-// (giữ nếu dự án có các model)
+// Models
 require("./models/user.model");
 require("./models/pet.model");
 require("./models/service.model");
@@ -50,6 +56,8 @@ require("./models/post.model");
 require("./models/promotion.model");
 require("./models/cart.model");
 require("./models/vetSchedule.model");
+require("./models/review.model");
+require("./models/reviewReply.model");
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -66,6 +74,7 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // API Routes
 app.use("/api/auth", authRouter);
+app.use("/api/profile", profileRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/bookings", bookingRouter);
@@ -77,9 +86,13 @@ app.use("/api/pets", petRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/wishlists", wishlistRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/uploads", express.static('uploads'));
 app.use("/api/schedules", scheduleRouter);
+app.use("/api/reviews", reviewRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/orders", orderRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
