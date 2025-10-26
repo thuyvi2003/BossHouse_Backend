@@ -5,7 +5,7 @@ const cartController = require('../controllers/cart.controller');
 const protectRoute = require('../middleware/auth.middleware');
 
 //Router
-router.post('/', protectRoute(['user', 'veterinarian']), cartController.addToCart);
+router.post('/add', protectRoute(['user', 'veterinarian']), cartController.addToCart);
 router.get('/', protectRoute(['user', 'veterinarian']), cartController.getCartsByUser);
 router.put('/:itemId', protectRoute(['user', 'veterinarian']), cartController.editCartItemQuantity);
 router.delete('/', protectRoute(['user', 'veterinarian']), cartController.removeItem);

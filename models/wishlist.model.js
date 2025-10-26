@@ -1,3 +1,4 @@
+//Vo Lam Thuy Vi
 const mongoose = require('mongoose');
 
 const wishlistSchema = new mongoose.Schema(
@@ -12,10 +13,20 @@ const wishlistSchema = new mongoose.Schema(
       ref: "ProductVariation",
       required: true,
     },
+      group_id: {                           
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WishlistGroup",
+      default: null,
+    },
     note: {
       type: String,
       trim: true,
       maxlength: 255,
+    },
+      status: {
+      type: String,
+      enum: ["active", "moved_to_cart", "removed"],
+      default: "active",
     },
   },
   {
