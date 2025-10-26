@@ -37,4 +37,8 @@ router.post('/:id/send', protectRoute(['admin']), notificationController.sendNot
 router.post('/:id/schedule', protectRoute(['admin']), notificationController.scheduleNotification);
 router.get('/stats/overview', protectRoute(['admin']), notificationController.getNotificationStats);
 
+// Read/Unread
+router.post('/:id/read', protectRoute(['admin','staff','veterinarian','user']), notificationController.markAsRead);
+router.post('/:id/unread', protectRoute(['admin','staff','veterinarian','user']), notificationController.markAsUnread);
+
 module.exports = router;

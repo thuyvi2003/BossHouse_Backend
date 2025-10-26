@@ -91,7 +91,9 @@ exports.createReview = async (reviewData, userId, userRole) => {
             images: uploadedImageUrls,
             user_id: userId,
             created_by_role: userRole,
-            status: orderSuccessful ? 'visible' : 'hidden',
+            // New reviews should appear on dashboard as "visible" by default
+            // regardless of order check outcome. We still store order flags.
+            status: 'visible',
             order_id: foundOrderId,
             order_successful: orderSuccessful
         });
@@ -137,12 +139,16 @@ exports.getAllReviews = async (filters = {}, userRole = 'guest') => {
             if (max_rating) query.rating.$lte = parseInt(max_rating);
         }
 
-        // Status filter - Admin can see all, others only visible
+        // Status filter
+        // - Admin: can view all or filter by any status
+        // - Staff/Veterinarian: can filter by provided status; default to visible if none provided
+        // - User/Guest: only visible
         if (userRole === 'admin') {
             if (status) query.status = status;
-            // Admin can see all statuses if no filter specified
+        } else if (userRole === 'staff' || userRole === 'veterinarian') {
+            query.status = status || 'visible';
         } else {
-            query.status = 'visible'; // Non-admin only see visible reviews
+            query.status = 'visible';
         }
 
         const skip = (page - 1) * limit;
@@ -261,11 +267,11 @@ exports.deleteOrHideReview = async (reviewId, userId, userRole) => {
             // Admin toggles visibility: hidden <-> visible
             updateData.status = review.status === 'hidden' ? 'visible' : 'hidden';
         } else {
-            // User/Staff/Veterinarian can only delete their own review
+            // User/Staff/Veterinarian can only hide their own review (not hard-delete)
             if (review.user_id.toString() !== userId.toString()) {
                 throw new Error('You can only delete your own reviews');
             }
-            updateData.status = 'deleted';
+            updateData.status = 'hidden';
         }
 
         const updatedReview = await Review.findByIdAndUpdate(

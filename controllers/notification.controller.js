@@ -86,6 +86,32 @@ exports.updateNotification = async (req, res, next) => {
 };
 
 /**
+ * Mark as read
+ */
+exports.markAsRead = async (req, res, next) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const result = await notificationService.setReadStatus(req.params.id, userId, true);
+        res.status(200).json({ success: true, message: 'Marked as read', data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Mark as unread
+ */
+exports.markAsUnread = async (req, res, next) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const result = await notificationService.setReadStatus(req.params.id, userId, false);
+        res.status(200).json({ success: true, message: 'Marked as unread', data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * 84. Delete Notification (Xóa thông báo) - Admin only
  */
 exports.deleteNotification = async (req, res, next) => {
