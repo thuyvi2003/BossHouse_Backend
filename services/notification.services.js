@@ -103,11 +103,21 @@ exports.getAllNotifications = async (filters = {}, userRole = 'user', userId = n
 
         // Target audience filter
         if (userRole !== 'admin') {
+            // Non-admin users: only see notifications for them
             andConditions.push({
                 $or: [
                     { target_audience: 'all' },
                     { target_audience: userRole },
                     { target_users: userId }
+                ]
+            });
+        } else {
+            // Admin users: only see admin-targeted notifications in dashboard
+            // This ensures admin dashboard only shows admin notifications
+            andConditions.push({
+                $or: [
+                    { target_audience: 'all' },
+                    { target_audience: 'admin' }
                 ]
             });
         }
@@ -202,6 +212,126 @@ exports.getAllNotifications = async (filters = {}, userRole = 'user', userId = n
         };
     } catch (error) {
         throw new Error(`Error getting notifications: ${error.message}`);
+    }
+};
+
+/**
+ * 81b. Get Homepage Notifications - User context (always shows user-targeted notifications)
+ */
+exports.getHomepageNotifications = async (filters = {}, userRole = 'user', userId = null) => {
+    try {
+        const {
+            type,
+            priority,
+            status = 'active', // Always active for homepage
+            target_audience,
+            search,
+            read_status,
+            page = 1,
+            limit = 10,
+            sort = '-created_at'
+        } = filters;
+
+        const query = {};
+
+        // Basic filters
+        if (type) query.type = type;
+        if (priority) query.priority = priority;
+        
+        // Always active for homepage
+        query.status = 'active';
+
+        // Build complex query with $and if needed
+        const andConditions = [];
+        
+        // Search filter
+        if (search) {
+            andConditions.push({
+                $or: [
+                    { title: { $regex: search, $options: 'i' } },
+                    { content: { $regex: search, $options: 'i' } }
+                ]
+            });
+        }
+
+        // Target audience filter - ALWAYS user context for homepage
+        andConditions.push({
+            $or: [
+                { target_audience: 'all' },
+                { target_audience: userRole },
+                { target_users: userId }
+            ]
+        });
+
+        // If we have andConditions, use $and
+        if (andConditions.length > 0) {
+            query.$and = andConditions;
+        }
+
+        // Get all notifications first
+        const skip = (page - 1) * limit;
+        const sortObj = {};
+        if (sort.startsWith('-')) {
+            sortObj[sort.substring(1)] = -1;
+        } else {
+            sortObj[sort] = 1;
+        }
+
+        const allNotifications = await Notification.find(query)
+            .populate('created_by', 'name email username')
+            .sort(sortObj)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        // Attach read status and filter
+        let notificationsWithRead = allNotifications;
+        if (userId) {
+            try {
+                const ids = allNotifications.map(n => n._id);
+                console.log('=== HOMEPAGE NOTIFICATIONS DEBUG ===');
+                console.log('User ID:', userId);
+                console.log('Notification IDs:', ids.slice(0, 3));
+                
+                const readDocs = await NotificationRead.find({ user_id: userId, notification_id: { $in: ids } }, 'notification_id');
+                console.log('Found read documents:', readDocs.length);
+                console.log('Read docs:', readDocs.slice(0, 3));
+                
+                const readSet = new Set(readDocs.map(d => String(d.notification_id)));
+                notificationsWithRead = allNotifications.map(n => ({ ...n, is_read: readSet.has(String(n._id)) }));
+                
+                console.log('Read status mapping:', notificationsWithRead.slice(0, 3).map(n => ({ 
+                    id: n._id, 
+                    title: n.title, 
+                    is_read: n.is_read 
+                })));
+                console.log('================================');
+                
+                // Filter by read status if specified
+                if (read_status === 'read') {
+                    notificationsWithRead = notificationsWithRead.filter(n => n.is_read === true);
+                } else if (read_status === 'unread') {
+                    notificationsWithRead = notificationsWithRead.filter(n => n.is_read === false);
+                }
+            } catch (readError) {
+                console.error('Error processing read status:', readError);
+                notificationsWithRead = allNotifications.map(n => ({ ...n, is_read: false }));
+            }
+        }
+
+        // Count total for pagination
+        const total = await Notification.countDocuments(query);
+
+        return {
+            notifications: notificationsWithRead,
+            pagination: {
+                current_page: parseInt(page),
+                total_pages: Math.ceil(total / limit),
+                total_items: total,
+                items_per_page: parseInt(limit)
+            }
+        };
+    } catch (error) {
+        throw new Error(`Error getting homepage notifications: ${error.message}`);
     }
 };
 
@@ -357,7 +487,13 @@ exports.searchNotifications = async (searchQuery, filters = {}, userRole = 'user
 
         // Status filter based on role
         if (userRole === 'admin') {
-            // Admin can search all notifications
+            // Admin can search all notifications but only admin-targeted ones
+            query.$and.push({
+                $or: [
+                    { target_audience: 'all' },
+                    { target_audience: 'admin' }
+                ]
+            });
         } else {
             query.$and.push({ status: 'active' });
             query.$and.push({

@@ -41,6 +41,27 @@ exports.listNotifications = async (req, res, next) => {
 };
 
 /**
+ * 81b. Get Homepage Notifications (Lấy thông báo cho homepage) - User context
+ */
+exports.getHomepageNotifications = async (req, res, next) => {
+    try {
+        const userId = req.user.id || req.user._id;
+        const userRole = req.user.role.toLowerCase();
+        
+        // For homepage, always use user context (not admin dashboard context)
+        const result = await notificationService.getHomepageNotifications(req.query, userRole, userId);
+        
+        res.status(200).json({
+            success: true,
+            message: 'Homepage notifications retrieved successfully',
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * 82. View Notification Detail (Xem chi tiết thông báo) - Admin/Staff/Veterinarian/User
  */
 exports.getNotification = async (req, res, next) => {
