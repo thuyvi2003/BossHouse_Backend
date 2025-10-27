@@ -89,3 +89,23 @@ exports.getAllOrders = async (page = 1, limit = 10) => {
     const total = await Order.countDocuments();
     return { total, orders }
 }
+
+
+exports.getOrdersByUser = async (userId, page = 1, limit = 6) => {
+  const skip = (page - 1) * limit;
+  const [orders, total] = await Promise.all([
+    Order.find({ user_id: userId })
+      .populate("promotion_id")
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(limit),
+    Order.countDocuments({ user_id: userId }),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+  return {
+    status: "success",
+    data: orders,
+    pagination: { total, totalPages, page },
+  };
+};

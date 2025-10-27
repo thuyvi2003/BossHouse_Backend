@@ -85,7 +85,7 @@ const orderSchema = new mongoose.Schema(
     },
     payment_method: {
       type: String,
-      enum: ["cash", "credit_card", "vnpay", "momo", "paypal"],
+      enum: ["cash", "vnpay"],
       default: "cash",
     },
     payment_status: {
@@ -95,12 +95,12 @@ const orderSchema = new mongoose.Schema(
     },
 
     shipping_address: {
-      full_name: String,
+      name: String,
+      email: String,
       phone: String,
-      address_line: String,
+      country: String,
       city: String,
-      province: String,
-      postal_code: String,
+      address: String,
     },
     note: {
       type: String,
