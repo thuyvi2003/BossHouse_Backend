@@ -1,4 +1,14 @@
-const { changePasswordService, deleteAccountService, getLoginHistoryService } = require("../services/profile.services.js");
+const {
+    changePasswordService,
+    deleteAccountService,
+    getLoginHistoryService,
+    getProfileService,
+    updateProfileService,
+    uploadAvatarService
+} = require("../services/profile.services.js");
+
+const { handleUploadError, uploadSingle } = require("../middleware/upload.middleware.js");
+
 
 const changePassword = async (req, res) => {
     try {
@@ -35,4 +45,31 @@ const getLoginHistory = async (req, res) => {
     }
 };
 
-module.exports = { changePassword, deleteAccount, getLoginHistory };
+const getProfile = async (req, res, next) => {
+    try {
+        const profile = await getProfileService(req.user._id);
+        res.status(200).json({ success: true, data: profile });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateProfile = async (req, res, next) => {
+    try {
+        const profile = await updateProfileService(req.user._id, req.user.role, req.body);
+        res.status(200).json({ success: true, data: profile });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const uploadAvatar = async (req, res, next) => {
+    try {
+        const user = await uploadAvatarService(req.user._id, req.file);
+        res.status(200).json({ success: true, data: user });
+    } catch (error) {
+        handleUploadError(error, req, res, next);
+    }
+};
+
+module.exports = { changePassword, deleteAccount, getLoginHistory, getProfile, updateProfile, uploadAvatar };

@@ -1,5 +1,9 @@
+const mongoose = require("mongoose");
 const User = require("../models/user.model.js");
 const bcrypt = require("bcryptjs");
+
+const Veterinarian = require("../models/veterinarian.model.js");
+const { uploadToCloudinary, deleteFromCloudinary } = require("./cloudinary.services.js");
 
 const changePasswordService = async (userId, currentPassword, newPassword, confirmPassword) => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -81,4 +85,159 @@ const getLoginHistoryService = async (userId, page = 1, limit = 10) => {
     };
 };
 
-module.exports = { changePasswordService, deleteAccountService, getLoginHistoryService };
+const getProfileService = async (userId) => {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new Error("Invalid user ID format!");
+    }
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+        throw new Error("User not found!");
+    }
+
+    if (user.is_deleted) {
+        throw new Error("This account has been deleted!");
+    }
+
+    let veterinarian = null;
+    if (user.role === "veterinarian") {
+        veterinarian = await Veterinarian.findOne({ user_id: userId });
+        console.log("Veterinarian query for userId:", userId, "Result:", veterinarian); // Debug log
+    }
+
+    return {
+        user: {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            profile_image: user.profile_image,
+            role: user.role,
+            created_at: user.created_at,
+        },
+        veterinarian: veterinarian
+            ? {
+                specialty: veterinarian.specialty,
+                years_experience: veterinarian.years_experience,
+                bio: veterinarian.bio,
+            }
+            : null,
+    };
+};
+
+const updateProfileService = async (userId, role, profileData) => {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new Error("Invalid user ID format!");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error("User not found!");
+    }
+
+    if (user.is_deleted) {
+        throw new Error("This account has been deleted!");
+    }
+
+    // Update name for all roles
+    if (profileData.name) {
+        if (typeof profileData.name !== "string" || profileData.name.length < 3) {
+            throw new Error("Name must be a string with at least 3 characters!");
+        }
+        user.name = profileData.name;
+    }
+
+    // Update veterinarian-specific fields
+    let veterinarian = null;
+    if (role === "veterinarian") {
+        veterinarian = await Veterinarian.findOne({ user_id: userId });
+        console.log("Existing veterinarian for userId:", userId, "Result:", veterinarian); // Debug log
+        if (!veterinarian) {
+            veterinarian = new Veterinarian({ user_id: userId });
+            console.log("Created new veterinarian for userId:", userId); // Debug log
+        }
+
+        if (profileData.specialty !== undefined) {
+            if (typeof profileData.specialty !== "string") {
+                throw new Error("Specialty must be a string!");
+            }
+            veterinarian.specialty = profileData.specialty;
+        }
+
+        if (profileData.years_experience !== undefined) {
+            if (!Number.isInteger(Number(profileData.years_experience)) || Number(profileData.years_experience) <= 0) {
+                throw new Error("Years of experience must be a positive integer!");
+            }
+            veterinarian.years_experience = Number(profileData.years_experience);
+        }
+
+        if (profileData.bio !== undefined) {
+            if (typeof profileData.bio !== "string") {
+                throw new Error("Bio must be a string!");
+            }
+            veterinarian.bio = profileData.bio;
+        }
+
+        await veterinarian.save();
+        console.log("Saved veterinarian:", veterinarian); // Debug log
+    }
+
+    await user.save();
+
+    return {
+        user: {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            profile_image: user.profile_image,
+            role: user.role,
+            created_at: user.created_at,
+        },
+        veterinarian: veterinarian
+            ? {
+                specialty: veterinarian.specialty,
+                years_experience: veterinarian.years_experience,
+                bio: veterinarian.bio,
+            }
+            : null,
+    };
+};
+
+const uploadAvatarService = async (userId, image) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error("User not found!");
+    }
+
+    if (user.is_deleted) {
+        throw new Error("This account has been deleted!");
+    }
+
+    // Delete existing profile image from Cloudinary if it exists
+    if (user.profile_image && user.profile_image.includes("cloudinary.com")) {
+        await deleteFromCloudinary(user.profile_image);
+    }
+
+    // Upload new image to Cloudinary
+    const secureUrl = await uploadToCloudinary(image, "profile_images");
+    user.profile_image = secureUrl;
+
+    await user.save();
+
+    return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profile_image: user.profile_image,
+        role: user.role,
+        created_at: user.created_at,
+    };
+};
+
+module.exports = {
+    changePasswordService,
+    deleteAccountService,
+    getLoginHistoryService,
+    getProfileService,
+    updateProfileService,
+    uploadAvatarService
+};
