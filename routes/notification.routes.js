@@ -22,9 +22,6 @@ router.get('/search', protectRoute(['admin', 'staff', 'veterinarian', 'user']), 
 // 82. View notification detail - Admin/Staff/Veterinarian/User
 router.get('/:id', protectRoute(['admin', 'staff', 'veterinarian', 'user']), notificationController.getNotification);
 
-// =============================================================================
-// ADMIN ONLY ROUTES
-// =============================================================================
 
 // 80. Create notification - Admin only
 router.post('/', protectRoute(['admin']), notificationController.createNotification);
@@ -34,11 +31,6 @@ router.put('/:id', protectRoute(['admin']), notificationController.updateNotific
 
 // 84. Delete notification - Admin only
 router.delete('/:id', protectRoute(['admin']), notificationController.deleteNotification);
-
-// Additional admin routes
-router.post('/:id/send', protectRoute(['admin']), notificationController.sendNotification);
-router.post('/:id/schedule', protectRoute(['admin']), notificationController.scheduleNotification);
-router.get('/stats/overview', protectRoute(['admin']), notificationController.getNotificationStats);
 
 // Read/Unread
 router.post('/:id/read', protectRoute(['admin','staff','veterinarian','user']), notificationController.markAsRead);

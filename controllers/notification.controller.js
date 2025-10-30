@@ -1,7 +1,7 @@
-const notificationService = require('../services/notification.services');
+const notificationService = require('../services/notification.service');
 
 /**
- * 80. Create Notification (Tạo thông báo) - Admin only
+ * Create Notification (Tạo thông báo) - Admin only
  */
 exports.createNotification = async (req, res, next) => {
     try {
@@ -200,51 +200,6 @@ exports.sendNotification = async (req, res, next) => {
             success: true,
             message: 'Notification sent successfully',
             data: notification
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * Schedule Notification (Lên lịch thông báo) - Admin only
- */
-exports.scheduleNotification = async (req, res, next) => {
-    try {
-        const userId = req.user.id || req.user._id;
-        const userRole = req.user.role.toLowerCase();
-        const { scheduled_at } = req.body;
-        
-        const notification = await notificationService.scheduleNotification(
-            req.params.id, 
-            scheduled_at,
-            userId, 
-            userRole
-        );
-        
-        res.status(200).json({
-            success: true,
-            message: 'Notification scheduled successfully',
-            data: notification
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * Get Notification Stats (Thống kê thông báo) - Admin only
- */
-exports.getNotificationStats = async (req, res, next) => {
-    try {
-        const userRole = req.user.role.toLowerCase();
-        
-        const stats = await notificationService.getNotificationStats(userRole);
-        
-        res.status(200).json({
-            success: true,
-            message: 'Notification stats retrieved successfully',
-            data: stats
         });
     } catch (error) {
         next(error);
