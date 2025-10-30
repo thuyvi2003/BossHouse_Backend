@@ -96,6 +96,13 @@ exports.getOrdersByUser = async (userId, page = 1, limit = 6) => {
   const [orders, total] = await Promise.all([
     Order.find({ user_id: userId })
       .populate("promotion_id")
+      .populate({
+        path: "items.variation_id", 
+        populate: {                 
+          path: "product_id",
+          select: "name images category_id",
+        },
+      })
       .sort({ created_at: -1 })
       .skip(skip)
       .limit(limit),

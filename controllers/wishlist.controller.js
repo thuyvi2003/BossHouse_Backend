@@ -92,6 +92,25 @@ exports.moveToCart = async (req, res) => {
     }
 };
 
+exports.markAsPurchased = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { id } = req.params;
+        const result = await wishlistService.markAsPurchased(userId, id);
+        res.json({
+            success: true,
+            message: "Mark ad purchased successfully",
+            status: "success",
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
 
 //Group wishlist area
 exports.moveToGroup = async (req, res) => {
