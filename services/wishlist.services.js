@@ -69,15 +69,15 @@ exports.clearAllWishlist = async (userId, groupId = null) => {
 exports.moveToCart = async (userId, itemId) => {
   const item = await Wishlist.findOne({ _id: itemId, user_id: userId });
   if (!item) throw new Error("Wishlist item not found");
-   let cart = await Cart.findOne({ user_id: userId });
+  let cart = await Cart.findOne({ user_id: userId });
   if (!cart) cart = await Cart.create({ user_id: userId });
   //Tim xem item nay da co trong cart roi chua
- let cartItem = await CartItem.findOne({
+  let cartItem = await CartItem.findOne({
     cart_id: cart._id,
     variation_id: item.product_variation_id,
   });
   //Neu co roi thi tang quantity len
-   if (cartItem) {
+  if (cartItem) {
     cartItem.quantity += 1;
     await cartItem.save();
   } else { //Chua co thi create new Cart
@@ -88,11 +88,34 @@ exports.moveToCart = async (userId, itemId) => {
     });
   }
   await Wishlist.findByIdAndDelete(item._id);
-  return {  success: true, message: "Item moved to cart successfully" };
+  return { success: true, message: "Item moved to cart successfully" };
 
 }
 
+exports.markAsPurchased = async (userId, itemId) => {
+  const item = await Wishlist.findOne({ _id: itemId, user_id: userId });
+  if (!item) throw new Error("Wishlist item not found");
+  if (item.is_purchased === true)
+    return {
+      success: false,
+      message: "This item is already marked as purchased.",
+    };
 
+  item.is_purchased = true,
+    item.purchased_at = new Date();
+  await item.save();
+
+  const updatedItem = await Wishlist.findById(item._id)
+    .populate({
+      path: "product_variation_id",
+      populate: { path: "product_id" },
+    });
+  return {
+    success: true,
+    message: "Item marked as purchased successfully.",
+    data: updatedItem,
+  };
+}
 
 // Group wishlist area
 exports.createGroup = async (userId, name, description) => {
@@ -165,7 +188,7 @@ exports.getSharedWishlistGroup = async (groupId) => {
         populate: 'product_id',
       },
     })
-    .populate('user_id', 'profile_image'); 
+    .populate('user_id', 'profile_image');
 
   if (!group) throw new Error('This wishlist group is not shared or does not exist.');
   return group;

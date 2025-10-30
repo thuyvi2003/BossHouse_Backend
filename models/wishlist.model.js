@@ -28,6 +28,10 @@ const wishlistSchema = new mongoose.Schema(
       enum: ["active", "moved_to_cart", "removed"],
       default: "active",
     },
+    is_purchased: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

@@ -11,6 +11,8 @@ router.delete('/delete/:id', protectRoute(['user', 'veterinarian']), wishlistCon
 router.delete('/clear', protectRoute(['user', 'veterinarian']), wishlistController.clearAllWishlist);
 router.patch('/:id/move-to-cart', protectRoute(['user', 'veterinarian']), wishlistController.moveToCart);
 router.patch('/:id/move-to-group', protectRoute(['user', 'veterinarian']), wishlistController.moveToGroup);
+router.patch('/:id/mask-as-purchased', protectRoute(['user', 'veterinarian']), wishlistController.markAsPurchased);
+
 // Wishlist groups
 router.get('/groups', protectRoute(['user', 'veterinarian']), wishlistController.getGroups);
 router.post('/groups/create', protectRoute(['user', 'veterinarian']), wishlistController.createGroup);
