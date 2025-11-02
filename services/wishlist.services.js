@@ -202,3 +202,12 @@ exports.disableShare = async (userId, groupId) => {
     { new: true })
   return group;
 }
+
+exports.deleteGroup = async (userId, groupId) => {
+  const group = await wishlistGroup.findOneAndDelete({
+    _id: groupId,
+    user_id: userId
+  });
+  if (!group) throw new Error('Group not found or already deleted');
+  return group;
+}
