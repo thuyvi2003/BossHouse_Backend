@@ -7,8 +7,11 @@ const notificationController = require('../controllers/notification.controller')
 // AUTHENTICATED ROUTES - Admin/Staff/Veterinarian/User
 // =============================================================================
 
-// 81. View notification list - Admin/Staff/Veterinarian/User
-router.get('/', protectRoute(['admin', 'staff', 'veterinarian', 'user']), notificationController.listNotifications);
+// 81. View notification list - Admin/Staff/Veterinarian only (for management dashboard)
+router.get('/', protectRoute(['admin', 'staff', 'veterinarian']), notificationController.listNotifications);
+
+// 81b. View notifications for homepage - User context
+router.get('/homepage', protectRoute(['admin', 'staff', 'veterinarian', 'user']), notificationController.getHomepageNotifications);
 
 // 85. Search notification - Admin/Staff/Veterinarian/User
 router.get('/search', protectRoute(['admin', 'staff', 'veterinarian', 'user']), notificationController.searchNotifications);
@@ -36,5 +39,9 @@ router.delete('/:id', protectRoute(['admin']), notificationController.deleteNoti
 router.post('/:id/send', protectRoute(['admin']), notificationController.sendNotification);
 router.post('/:id/schedule', protectRoute(['admin']), notificationController.scheduleNotification);
 router.get('/stats/overview', protectRoute(['admin']), notificationController.getNotificationStats);
+
+// Read/Unread
+router.post('/:id/read', protectRoute(['admin','staff','veterinarian','user']), notificationController.markAsRead);
+router.post('/:id/unread', protectRoute(['admin','staff','veterinarian','user']), notificationController.markAsUnread);
 
 module.exports = router;

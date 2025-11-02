@@ -87,7 +87,7 @@ exports.removePromotion = async (promotionId) => {
 }
 
 
-exports.editPromotion = async (promotionId,updateData) => {
+exports.editPromotion = async (promotionId, updateData) => {
     try {
         const updatedPromotion = await Promotion.findByIdAndUpdate(
             promotionId,

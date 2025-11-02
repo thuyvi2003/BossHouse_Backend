@@ -118,15 +118,15 @@ const seed = async () => {
     }
     console.log("✅ Veterinarians seeded");
 
-    const now = new Date();
-    for (const [i, v] of vets.entries()) {
-      await VetSchedule.findOneAndUpdate(
-        { veterinarian_id: v._id, start_time: { $gte: now } },
-        { start_time: now, end_time: new Date(now.getTime() + (i + 1) * 60 * 60 * 1000) },
-        { upsert: true, new: true }
-      );
-    }
-    console.log("✅ Vet schedules seeded");
+    // const now = new Date();
+    // for (const [i, v] of vets.entries()) {
+    //   await VetSchedule.findOneAndUpdate(
+    //     { veterinarian_id: v._id, start_time: { $gte: now } },
+    //     { start_time: now, end_time: new Date(now.getTime() + (i + 1) * 60 * 60 * 1000) },
+    //     { upsert: true, new: true }
+    //   );
+    // }
+    // console.log("✅ Vet schedules seeded");
 
     const bookingData = [
       {
