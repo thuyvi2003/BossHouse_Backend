@@ -24,6 +24,7 @@ const wishlistRouter = require("./routes/wishlist.routes");
 const contactRouter = require("./routes/contact.routes");
 const reviewRouter = require("./routes/review.routes");
 const notificationRouter = require("./routes/notification.routes");
+const stockRouter = require("./routes/stock.routes");
 
 const app = express();
 
@@ -51,6 +52,7 @@ require("./models/productVariation.model");
 require("./models/contact.model");
 require("./models/review.model");
 require("./models/reviewReply.model");
+require("./models/stock.model");
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -82,6 +84,7 @@ app.use("/api/wishlists",wishlistRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/stocks", stockRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
