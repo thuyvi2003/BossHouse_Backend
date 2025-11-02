@@ -220,3 +220,21 @@ exports.disableShare = async (req, res) => {
         });
     }
 };
+exports.deleteGroup = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { groupId } = req.params;
+        const group = await wishlistService.deleteGroup(userId, groupId);
+        res.json({
+            success: true,
+            message: 'Group deleted successfully',
+            data: group
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+

@@ -18,5 +18,6 @@ router.get('/groups', protectRoute(['user', 'veterinarian']), wishlistController
 router.post('/groups/create', protectRoute(['user', 'veterinarian']), wishlistController.createGroup);
 router.post('/share/:groupId', protectRoute(['user', 'veterinarian']), wishlistController.shareWishlistGroup);
 router.get('/shared/:groupId', wishlistController.getSharedWishlistGroup);
+router.delete('/groups/delete/:groupId', protectRoute(['user', 'veterinarian']), wishlistController.deleteGroup);
 
 module.exports = router;
