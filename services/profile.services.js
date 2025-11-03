@@ -4,6 +4,10 @@ const bcrypt = require("bcryptjs");
 
 const Veterinarian = require("../models/veterinarian.model.js");
 const { uploadToCloudinary, deleteFromCloudinary } = require("./cloudinary.services.js");
+const { OAuth2Client } = require("google-auth-library");
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const changePasswordService = async (userId, currentPassword, newPassword, confirmPassword) => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -113,6 +117,7 @@ const getProfileService = async (userId) => {
             profile_image: user.profile_image,
             role: user.role,
             created_at: user.created_at,
+            google_id: user.google_id || null,  // Expose google_id for frontend
         },
         veterinarian: veterinarian
             ? {
@@ -233,11 +238,72 @@ const uploadAvatarService = async (userId, image) => {
     };
 };
 
+// Link Google service (requires existing email/password user)
+const linkGoogleService = async (userId, idToken) => {
+    if (!idToken) {
+        throw new Error("Google ID token is required!");
+    }
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload) {
+            throw new Error("Invalid Google token payload!");
+        }
+        const { sub: googleId, email } = payload;
+        if (!email) {
+            throw new Error("Email not found in Google token!");
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error("User not found!");
+        }
+        if (user.email !== email) {
+            throw new Error("Google email does not match your account email!");
+        }
+        if (user.google_id) {
+            throw new Error("Google account is already linked!");
+        }
+        // For Google-only users, password might be absent; but since this is linking to email account, assume password exists
+        if (!user.password) {
+            throw new Error("This Google-only account cannot link an email. Please create a new account with email.");
+        }
+        user.google_id = googleId;
+        await user.save();
+        return { success: true, message: "Google account linked successfully!" };
+    } catch (error) {
+        console.error("Google link error:", error.message);
+        throw error;
+    }
+};
+
+// Unlink Google service
+const unlinkGoogleService = async (userId) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error("User not found!");
+    }
+    if (!user.google_id) {
+        throw new Error("No Google account linked to unlink!");
+    }
+    // Prevent unlinking if it's the only login method (e.g., Google-only account)
+    if (!user.password) {
+        throw new Error("Cannot unlink: This is your only login method!");
+    }
+    user.google_id = null;
+    await user.save();
+    return { success: true, message: "Google account unlinked successfully!" };
+};
+
 module.exports = {
     changePasswordService,
     deleteAccountService,
     getLoginHistoryService,
     getProfileService,
     updateProfileService,
-    uploadAvatarService
+    uploadAvatarService,
+    linkGoogleService,
+    unlinkGoogleService,
 };
