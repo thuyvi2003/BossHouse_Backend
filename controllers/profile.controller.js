@@ -4,7 +4,9 @@ const {
     getLoginHistoryService,
     getProfileService,
     updateProfileService,
-    uploadAvatarService
+    uploadAvatarService,
+    linkGoogleService,
+    unlinkGoogleService,
 } = require("../services/profile.services.js");
 
 const { handleUploadError, uploadSingle } = require("../middleware/upload.middleware.js");
@@ -72,4 +74,27 @@ const uploadAvatar = async (req, res, next) => {
     }
 };
 
-module.exports = { changePassword, deleteAccount, getLoginHistory, getProfile, updateProfile, uploadAvatar };
+const linkGoogle = async (req, res, next) => {
+    try {
+        const { idToken } = req.body;
+        const userId = req.user._id;
+        const data = await linkGoogleService(userId, idToken);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Error in linkGoogle controller:", error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const unlinkGoogle = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const data = await unlinkGoogleService(userId);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Error in unlinkGoogle controller:", error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { changePassword, deleteAccount, getLoginHistory, getProfile, updateProfile, uploadAvatar, linkGoogle, unlinkGoogle, };

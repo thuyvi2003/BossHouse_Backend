@@ -11,6 +11,7 @@ const cors = require("cors");
 const promotionRouter = require("./routes/promotion.routes");
 const authRouter = require("./routes/auth.routes");
 const profileRouter = require("./routes/profile.routes");
+const accountManagementRouter = require("./routes/accountManagement.routes");
 const cartRouter = require("./routes/cart.routes");
 const bookingRouter = require("./routes/booking.routes");
 const categoryRouter = require("./routes/category.routes");
@@ -77,6 +78,7 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/admin/account-management", accountManagementRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/bookings", bookingRouter);
