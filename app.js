@@ -28,9 +28,7 @@ const scheduleRouter = require("./routes/vetSchdule.routes");
 const reviewRouter = require("./routes/review.routes");
 const notificationRouter = require("./routes/notification.routes");
 const orderRouter = require("./routes/order.routes");
-
 const stockRouter = require("./routes/stock.routes");
-const orderRouter = require("./routes/order.routes")
 const ghnShippingRouter = require("./routes/shipping.routes");
 const app = express();
 
