@@ -148,3 +148,28 @@ exports.markUnavailable = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// --- GET MY SCHEDULES (for logged-in vet) ---
+exports.getMySchedules = async (req, res) => {
+  try {
+    // 🔒 Đảm bảo chỉ vet mới được truy cập
+    if (req.user.role !== "veterinarian") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied: Only veterinarians can view their schedules",
+      });
+    }
+
+    // 🔍 Tìm tất cả lịch có veterinarian_id là của user hiện tại
+    const schedules = await VetSchedule.find({ veterinarian_id: req.user._id })
+      .populate({
+        path: "veterinarian_id",
+        populate: { path: "user_id", select: "name" },
+      })
+      .sort({ start_time: 1 });
+
+    res.status(200).json({ success: true, data: schedules });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

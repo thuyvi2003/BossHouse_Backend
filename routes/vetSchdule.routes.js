@@ -30,4 +30,11 @@ router.get("/vet/:vetId", protectRoute(["admin", "staff", "user"]), vetScheduleC
 // === MARK UNAVAILABLE ===
 router.put("/:id/unavailable", protectRoute(["admin", "staff"]), vetScheduleController.markUnavailable);
 
+// === GET MY SCHEDULES (Vet only) ===
+router.get(
+  "/my",
+  protectRoute(["veterinarian"]),
+  vetScheduleController.getMySchedules
+);
+
 module.exports = router;
