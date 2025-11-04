@@ -31,7 +31,7 @@ const orderRouter = require("./routes/order.routes");
 
 const stockRouter = require("./routes/stock.routes");
 const orderRouter = require("./routes/order.routes")
-
+const ghnShippingRouter = require("./routes/shipping.routes");
 const app = express();
 
 // Connect to MongoDB
@@ -101,6 +101,7 @@ app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/stocks", stockRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/shipping", ghnShippingRouter);
 
 
 // Catch 404

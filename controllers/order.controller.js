@@ -4,8 +4,8 @@ const orderService = require("../services/order.services");
 exports.createOrder = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { promotionCode, shippingFee, addressInfo } = req.body;
-        const order = await orderService.createOrder(userId, promotionCode, shippingFee, addressInfo);
+        const { selectedItemIds = [], promotionCode, shippingFee, addressInfo } = req.body;
+        const order = await orderService.createOrder(userId, selectedItemIds, promotionCode, shippingFee, addressInfo);
         res.status(201).json({
             success: true,
             message: "Order created successfully",

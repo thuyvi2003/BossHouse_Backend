@@ -99,7 +99,9 @@ const orderSchema = new mongoose.Schema(
       email: String,
       phone: String,
       country: String,
-      city: String,
+      province: Number,
+      district: Number, 
+      ward: String,    
       address: String,
     },
     note: {
