@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, register, verify, resend, forgotPassword, resetPassword, googleLogin } = require("../controllers/auth.controller.js");
+const { login, register, verify, resend, forgotPassword, resetPassword, googleLogin, logout } = require("../controllers/auth.controller.js");
 
 const router = express.Router();
 
@@ -17,5 +17,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 // Route for Google OAuth2 login
 router.post("/google-login", googleLogin);
+// Route for handling user logout
+router.post("/logout", logout);
 
 module.exports = router;
