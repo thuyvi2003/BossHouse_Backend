@@ -19,6 +19,7 @@ const productRouter = require("./routes/product.routes");
 const productVariationRouter = require("./routes/productVariation.routes");
 const userRouter = require("./routes/user.routes");
 const petRouter = require("./routes/pet.routes");
+const petTypeRouter = require("./routes/petType.routes");
 const serviceRouter = require("./routes/service.routes");
 const vetRouter = require("./routes/veterinarian.routes");
 const postRouter = require("./routes/post.routes");
@@ -48,6 +49,7 @@ mongoose
 // Models
 require("./models/user.model");
 require("./models/pet.model");
+require("./models/petType.model");
 require("./models/service.model");
 require("./models/veterinarian.model");
 require("./models/vetSchedule.model");
@@ -90,6 +92,7 @@ app.use("/api/products", productRouter);
 app.use("/api/variations", productVariationRouter);
 app.use("/api/users", userRouter);
 app.use("/api/pets", petRouter);
+app.use("/api/pet-types", petTypeRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/veterinarians", vetRouter);
 app.use("/api/posts", postRouter);
