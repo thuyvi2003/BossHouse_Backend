@@ -77,6 +77,11 @@ const loginService = async (email, password) => {
         throw new Error("Invalid email or password!");
     }
 
+    // check if account is banned
+    if (user.is_banned) {
+        throw new Error("This account has been banned!");
+    }
+
     // check if account is deleted
     if (user.is_deleted) {
         throw new Error("This account has been deleted!");
@@ -267,6 +272,11 @@ const googleLoginService = async (idToken) => {
                 { google_id: googleId }
             ]
         });
+
+        // Check if account is banned
+        if (user && user.is_banned) {
+            throw new Error("This account has been banned!");
+        }
 
         // Check if account is deleted
         if (user && user.is_deleted) {
