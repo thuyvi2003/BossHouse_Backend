@@ -100,7 +100,7 @@ exports.deleteOrHideReview = async (req, res, next) => {
             userRole
         );
         
-        const action = userRole === 'admin' ? 'hidden' : 'deleted';
+        const action = userRole === 'admin' ? (review.status === 'hidden' ? 'visible' : 'hidden') : 'hidden';
         
         res.status(200).json({
             success: true,

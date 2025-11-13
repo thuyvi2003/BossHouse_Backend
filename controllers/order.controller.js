@@ -4,8 +4,8 @@ const orderService = require("../services/order.services");
 exports.createOrder = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { promotionCode, shippingFee, addressInfo } = req.body;
-        const order = await orderService.createOrder(userId, promotionCode, shippingFee, addressInfo);
+        const { selectedItemIds = [], promotionCode, shippingFee, addressInfo } = req.body;
+        const order = await orderService.createOrder(userId, selectedItemIds, promotionCode, shippingFee, addressInfo);
         res.status(201).json({
             success: true,
             message: "Order created successfully",
@@ -32,21 +32,22 @@ exports.getAllOrders = async (req, res) => {
 
 
 
-// exports.getMyOrders = async (req, res) => {
-//   try {
-//     const userId = req.user._id;
-//     const { page = 1, limit = 10 } = req.query;
+exports.getMyOrders = async (req, res) => {
+  try {
+    const userId = req.user._id; 
+    const { page = 1, limit = 10 } = req.query;
 
-//     const result = await orderService.getOrdersByUser(
-//       userId,
-//       parseInt(page),
-//       parseInt(limit)
-//     );
-//     res.json({ success: true, ...result });
-//   } catch (err) {
-//     res.status(400).json({ success: false, message: err.message });
-//   }
-// };
+    const result = await orderService.getOrdersByUser(
+      userId,
+      parseInt(page),
+      parseInt(limit)
+    );
+
+    res.json({ success: true, ...result });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
 
 
 // exports.getOrderDetail = async (req, res) => {

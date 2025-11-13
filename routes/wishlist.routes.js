@@ -11,10 +11,13 @@ router.delete('/delete/:id', protectRoute(['user', 'veterinarian']), wishlistCon
 router.delete('/clear', protectRoute(['user', 'veterinarian']), wishlistController.clearAllWishlist);
 router.patch('/:id/move-to-cart', protectRoute(['user', 'veterinarian']), wishlistController.moveToCart);
 router.patch('/:id/move-to-group', protectRoute(['user', 'veterinarian']), wishlistController.moveToGroup);
+router.patch('/:id/mask-as-purchased', protectRoute(['user', 'veterinarian']), wishlistController.markAsPurchased);
+
 // Wishlist groups
 router.get('/groups', protectRoute(['user', 'veterinarian']), wishlistController.getGroups);
 router.post('/groups/create', protectRoute(['user', 'veterinarian']), wishlistController.createGroup);
-router.post('/groups/:groupId/share', protectRoute(['user', 'veterinarian']), wishlistController.shareWishlistGroup);
-router.patch('/groups/:groupId/unshare', protectRoute(['user', 'veterinarian'], wishlistController.disableShare));
+router.post('/share/:groupId', protectRoute(['user', 'veterinarian']), wishlistController.shareWishlistGroup);
+router.get('/shared/:groupId', wishlistController.getSharedWishlistGroup);
+router.delete('/groups/delete/:groupId', protectRoute(['user', 'veterinarian']), wishlistController.deleteGroup);
 
 module.exports = router;

@@ -11,6 +11,7 @@ const cors = require("cors");
 const promotionRouter = require("./routes/promotion.routes");
 const authRouter = require("./routes/auth.routes");
 const profileRouter = require("./routes/profile.routes");
+const accountManagementRouter = require("./routes/accountManagement.routes");
 const cartRouter = require("./routes/cart.routes");
 const bookingRouter = require("./routes/booking.routes");
 const categoryRouter = require("./routes/category.routes");
@@ -26,9 +27,11 @@ const contactRouter = require("./routes/contact.routes");
 const scheduleRouter = require("./routes/vetSchdule.routes");
 const reviewRouter = require("./routes/review.routes");
 const notificationRouter = require("./routes/notification.routes");
-const orderRouter = require("./routes/order.routes")
 const chatbotRouter = require("./routes/chatbot.routes");
 
+const orderRouter = require("./routes/order.routes");
+const stockRouter = require("./routes/stock.routes");
+const ghnShippingRouter = require("./routes/shipping.routes");
 const app = express();
 
 // Connect to MongoDB
@@ -59,6 +62,8 @@ require("./models/cart.model");
 require("./models/vetSchedule.model");
 require("./models/review.model");
 require("./models/reviewReply.model");
+require("./models/stock.model");
+
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -76,6 +81,7 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/admin/account-management", accountManagementRouter);
 app.use("/api/promotions", promotionRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/bookings", bookingRouter);
@@ -93,8 +99,11 @@ app.use("/uploads", express.static('uploads'));
 app.use("/api/schedules", scheduleRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/stocks", stockRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/chatbot", chatbotRouter);
+app.use("/api/shipping", ghnShippingRouter);
+
 
 // Catch 404
 app.use(function (req, res, next) {
