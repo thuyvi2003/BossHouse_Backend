@@ -30,6 +30,8 @@ const notificationRouter = require("./routes/notification.routes");
 const orderRouter = require("./routes/order.routes");
 const stockRouter = require("./routes/stock.routes");
 const ghnShippingRouter = require("./routes/shipping.routes");
+const membershipRouter = require("./routes/membership.routes");
+const statisticsRouter = require("./routes/statistics.routes"); 
 const app = express();
 
 // Connect to MongoDB
@@ -61,6 +63,7 @@ require("./models/vetSchedule.model");
 require("./models/review.model");
 require("./models/reviewReply.model");
 require("./models/stock.model");
+require("./models/membership.model");
 
 
 // View engine setup
@@ -100,7 +103,8 @@ app.use("/api/notifications", notificationRouter);
 app.use("/api/stocks", stockRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/shipping", ghnShippingRouter);
-
+app.use("/api/memberships", membershipRouter);
+app.use("/api/statistics", statisticsRouter); // ADD THIS LINE
 
 // Catch 404
 app.use(function (req, res, next) {
