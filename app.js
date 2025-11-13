@@ -27,6 +27,7 @@ const scheduleRouter = require("./routes/vetSchdule.routes");
 const reviewRouter = require("./routes/review.routes");
 const notificationRouter = require("./routes/notification.routes");
 const orderRouter = require("./routes/order.routes")
+const chatbotRouter = require("./routes/chatbot.routes");
 
 const app = express();
 
@@ -93,6 +94,7 @@ app.use("/api/schedules", scheduleRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/chatbot", chatbotRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
