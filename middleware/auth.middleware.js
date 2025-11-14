@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const TokenBlacklist = require('../models/tokenblacklist.model');
 
 const protectRoute = (requiredRoles) => async (req, res, next) => {
 
@@ -10,6 +11,13 @@ const protectRoute = (requiredRoles) => async (req, res, next) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
+
+    // Check blacklist first (fast query due to unique index)
+    const blacklisted = await TokenBlacklist.findOne({ token });
+    if (blacklisted) {
+      return res.status(401).json({ message: "Token has been invalidated" });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.userId).select("-password");

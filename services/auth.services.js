@@ -4,6 +4,7 @@ const NodeCache = require("node-cache");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { OAuth2Client } = require("google-auth-library");
+const TokenBlacklist = require("../models/tokenblacklist.model.js");
 
 // Initialize in-memory cache for OTP and reset tokens
 const otpCache = new NodeCache({
@@ -74,6 +75,11 @@ const loginService = async (email, password) => {
     const user = await User.findOne({ email });
     if (!user) {
         throw new Error("Invalid email or password!");
+    }
+
+    // check if account is banned
+    if (user.is_banned) {
+        throw new Error("This account has been banned!");
     }
 
     // check if account is deleted
@@ -267,6 +273,11 @@ const googleLoginService = async (idToken) => {
             ]
         });
 
+        // Check if account is banned
+        if (user && user.is_banned) {
+            throw new Error("This account has been banned!");
+        }
+
         // Check if account is deleted
         if (user && user.is_deleted) {
             throw new Error("This account has been deleted!");
@@ -317,6 +328,37 @@ const googleLoginService = async (idToken) => {
     }
 };
 
+const logoutService = async (token) => {
+    if (!token) {
+        throw new Error("Token is required!");
+    }
+    try {
+        // Verify JWT with secret (checks signature, exp, etc.)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Basic sanity check (verify ensures structure, but confirm userId for safety)
+        if (!decoded.userId) {
+            throw new Error("Invalid token structure!");
+        }
+        const expiresAt = new Date(decoded.exp * 1000); // Convert Unix timestamp to Date
+
+        // Insert into blacklist (unique will error if already blacklisted, but idempotent)
+        await TokenBlacklist.create({ token, expiresAt });
+        return { success: true, message: "Logged out successfully!" };
+    } catch (error) {
+
+        // Handle JWT-specific errors gracefully
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            throw new Error("Token is not valid");
+        }
+
+        if (error.code === 11000) { // Duplicate key error
+            return { success: true, message: "Already logged out!" };
+        }
+        throw error;
+    }
+};
+
 module.exports = {
     loginService,
     registerService,
@@ -324,5 +366,6 @@ module.exports = {
     verifyOTP,
     forgotPasswordService,
     resetPasswordService,
-    googleLoginService
+    googleLoginService,
+    logoutService
 };

@@ -1,4 +1,4 @@
-const { loginService, registerService, resendOTP, verifyOTP, forgotPasswordService, resetPasswordService, googleLoginService } = require("../services/auth.services.js");
+const { loginService, registerService, resendOTP, verifyOTP, forgotPasswordService, resetPasswordService, googleLoginService, logoutService } = require("../services/auth.services.js");
 
 const login = async (req, res) => {
     try {
@@ -78,4 +78,15 @@ const googleLogin = async (req, res) => {
     }
 };
 
-module.exports = { login, register, verify, resend, forgotPassword, resetPassword, googleLogin };
+const logout = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace("Bearer ", "");
+        await logoutService(token);
+        res.status(200).json({ success: true, message: "Logged out successfully!" });
+    } catch (error) {
+        console.error("Error in logout controller:", error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { login, register, verify, resend, forgotPassword, resetPassword, googleLogin, logout };
