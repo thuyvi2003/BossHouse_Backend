@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema(
             enum: ["user", "admin", "staff", "veterinarian", "guest"],
             default: "user",
         },
+        // Total membership points (number) used for membership rank calculation
+        membership_points: {
+            type: Number,
+            default: 0,
+        },
+        // Whether the user is banned (separate boolean flag)
         is_banned: {
             type: Boolean,
             default: false,

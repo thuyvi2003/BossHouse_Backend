@@ -118,6 +118,7 @@ const getProfileService = async (userId) => {
             role: user.role,
             created_at: user.created_at,
             google_id: user.google_id || null,  // Expose google_id for frontend
+            membership_points: user.membership_points ?? 0,
         },
         veterinarian: veterinarian
             ? {
