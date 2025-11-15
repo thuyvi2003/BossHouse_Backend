@@ -289,12 +289,15 @@ const unlinkGoogleService = async (userId) => {
     if (!user.google_id) {
         throw new Error("No Google account linked to unlink!");
     }
-    // Prevent unlinking if it's the only login method (e.g., Google-only account)
+    // FIXED: Prevent unlinking if it's the only login method
     if (!user.password) {
-        throw new Error("Cannot unlink: This is your only login method!");
+        throw new Error("Cannot unlink Google: This is your only login method!");
     }
-    user.google_id = null;
-    await user.save();
+    // FIXED: Use $unset to remove field (avoids null duplicate key error)
+    await User.updateOne(
+        { _id: userId },
+        { $unset: { google_id: 1 } }  // Removes google_id field entirely
+    );
     return { success: true, message: "Google account unlinked successfully!" };
 };
 

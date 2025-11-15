@@ -6,10 +6,8 @@ const getAccountsService = async (query = {}) => {
     const { search, role, status, page = 1, limit = 8 } = query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Build filter
-    const filter = {
-        is_deleted: false,  // Exclude deleted accounts
-    };
+    // Build filter - REMOVED: is_deleted: false to include soft-deleted
+    const filter = {};
 
     if (search) {
         filter.$or = [
@@ -25,26 +23,31 @@ const getAccountsService = async (query = {}) => {
     if (status && status !== "all") {
         if (status === "active") {
             filter.is_banned = false;
+            filter.is_deleted = false;
         } else if (status === "banned") {
             filter.is_banned = true;
+            filter.is_deleted = false;
+        } else if (status === "inactive") {  // NEW: Filter for soft-deleted
+            filter.is_deleted = true;
         }
     }
 
-    // Fetch paginated accounts
+    // Fetch paginated accounts - UPDATED: Select includes is_deleted
     const accounts = await User.find(filter)
-        .select("name email role is_banned created_at")
+        .select("name email role is_banned is_deleted created_at")  // ADDED: is_deleted
         .sort({ created_at: -1 })
         .skip(skip)
         .limit(parseInt(limit))
         .lean();
 
-    // Map to frontend format
+    // Map to frontend format - UPDATED: Status logic includes inactive
     const formattedAccounts = accounts.map((user) => ({
         id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role,
-        status: user.is_banned ? "banned" : "active",
+        status: user.is_deleted ? "inactive" : (user.is_banned ? "banned" : "active"),  // NEW: inactive for deleted
+        is_deleted: user.is_deleted,  // NEW: Expose for frontend disabling/tooltips
         createdAt: user.created_at,
     }));
 
@@ -67,8 +70,8 @@ const getAccountDetailService = async (userId) => {
         throw new Error("Invalid user ID format!");
     }
 
-    const user = await User.findOne({ _id: userId, is_deleted: false })
-        .select("name email role is_banned created_at")
+    const user = await User.findOne({ _id: userId })  // REMOVED: is_deleted: false to include deleted
+        .select("name email role is_banned is_deleted created_at")  // NEW: Added is_deleted to select
         .lean();
 
     if (!user) {
@@ -80,7 +83,8 @@ const getAccountDetailService = async (userId) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        status: user.is_banned ? "banned" : "active",
+        status: user.is_deleted ? "inactive" : (user.is_banned ? "banned" : "active"),  // FIXED: Prioritize is_deleted like in list
+        is_deleted: user.is_deleted,  // NEW: Expose flag (for potential frontend use, e.g., gray out fields)
         createdAt: user.created_at,
     };
 };
