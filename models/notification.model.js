@@ -73,7 +73,7 @@ const notificationSchema = new mongoose.Schema(
     // Optional: Link to related entity
     related_type: { 
       type: String, 
-      enum: ['product', 'service', 'booking', 'review', 'post', 'promotion'] 
+      enum: ['product', 'service', 'booking', 'review', 'post', 'promotion', 'event'] 
     },
     related_id: { 
       type: mongoose.Schema.Types.ObjectId 
