@@ -39,7 +39,8 @@ exports.getAllPromotionsUser = async (userId, page, limit) => {
 
   // If user has an empty cart (no items), do not show promotions
   if (userId) {
-    const itemsCount = (userCart && Array.isArray(userCart.items)) ? userCart.items.length : 0;
+    const itemsCount =
+      userCart && Array.isArray(userCart.items) ? userCart.items.length : 0;
     if (itemsCount === 0) {
       return { promotionsList: [], total: 0 };
     }
