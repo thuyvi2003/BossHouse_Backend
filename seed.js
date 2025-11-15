@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 // Import models
 const User = require("./models/user.model");
+const PetType = require("./models/petType.model");
 const Pet = require("./models/pet.model");
 const Service = require("./models/service.model");
 const Veterinarian = require("./models/veterinarian.model");
@@ -17,6 +18,7 @@ mongoose
 
 const seed = async () => {
   try {
+    // --- Users ---
     const userData = [
       { email: "alice@test.com", name: "Alice", password: "123456" },
       { email: "bob@test.com", name: "Bob", password: "123456" },
@@ -36,6 +38,25 @@ const seed = async () => {
     }
     console.log("✅ Users seeded");
 
+    // --- Pet Types ---
+    const petTypeData = [
+      { name: "Cat" },
+      { name: "Dog" },
+      { name: "Bird" },
+    ];
+
+    const petTypes = [];
+    for (const pt of petTypeData) {
+      const petType = await PetType.findOneAndUpdate(
+        { name: pt.name },
+        pt,
+        { upsert: true, new: true }
+      );
+      petTypes.push(petType);
+    }
+    console.log("✅ Pet types seeded");
+
+    // --- Pets ---
     const petData = [
       { user_id: users[0]._id, name: "Fluffy", species: "Cat", breed: "Persian", gender: "female", age: 3, weight: 4.5 },
       { user_id: users[1]._id, name: "Buddy", species: "Dog", breed: "Beagle", gender: "male", age: 5, weight: 12 },
@@ -46,43 +67,45 @@ const seed = async () => {
 
     const pets = [];
     for (const p of petData) {
+      const speciesObj = petTypes.find((pt) => pt.name === p.species);
       const pet = await Pet.findOneAndUpdate(
         { user_id: p.user_id, name: p.name },
-        p,
+        { ...p, species: speciesObj._id },
         { upsert: true, new: true }
       );
       pets.push(pet);
     }
     console.log("✅ Pets seeded");
 
+    // --- Services ---
     const serviceData = [
       {
         name: "Grooming",
-        description: "Our grooming service provides a full spa experience for your pet. This includes a gentle bath, fur trimming or haircut according to breed standards, nail clipping, ear cleaning, and a final brushing to make your pet look and feel their best. We ensure a stress-free environment for your pet's comfort and safety.",
+        description: "Full spa grooming for pets.",
         base_price: 40,
         duration_minutes: 45,
       },
       {
         name: "Boarding",
-        description: "Our boarding service offers a safe and comfortable stay for your pet while you are away. Pets receive daily meals, exercise, and attention from our trained staff. We provide clean bedding, spacious accommodations, and ensure your pet's routine and health are maintained throughout their stay.",
+        description: "Safe boarding for pets while you're away.",
         base_price: 100,
-        duration_minutes: 1440, // 1 day
+        duration_minutes: 1440,
       },
       {
         name: "Health Check",
-        description: "Routine health checks to ensure your pet is in optimal health. Includes physical examination, weight check, vital signs assessment, and recommendations for diet, exercise, or preventive care. Early detection of health issues helps keep your pet happy and healthy.",
+        description: "Routine health check for pets.",
         base_price: 50,
         duration_minutes: 30,
       },
       {
         name: "Vaccination",
-        description: "Our vaccination package protects your pet from common diseases. Administered by licensed veterinarians, the service includes a review of vaccination history, administration of vaccines according to age and health status, and monitoring for any immediate reactions. Essential for your pet's health and legal requirements.",
+        description: "Administer vaccines for pets.",
         base_price: 60,
         duration_minutes: 20,
       },
       {
         name: "Adoption Consultation",
-        description: "A professional consultation to guide you through the pet adoption process. We discuss the responsibilities of pet ownership, suitable pet options based on lifestyle, training tips, and introduction to local shelters. Ensures a smooth and informed adoption experience.",
+        description: "Consultation for pet adoption.",
         base_price: 20,
         duration_minutes: 60,
       },
@@ -99,6 +122,7 @@ const seed = async () => {
     }
     console.log("✅ Services seeded");
 
+    // --- Veterinarians ---
     const vetData = [
       { user_id: users[0]._id, specialty: "Surgery", years_experience: 10, bio: "Expert in pet surgeries" },
       { user_id: users[1]._id, specialty: "Dermatology", years_experience: 7, bio: "Skin specialist" },
@@ -118,57 +142,13 @@ const seed = async () => {
     }
     console.log("✅ Veterinarians seeded");
 
-    // const now = new Date();
-    // for (const [i, v] of vets.entries()) {
-    //   await VetSchedule.findOneAndUpdate(
-    //     { veterinarian_id: v._id, start_time: { $gte: now } },
-    //     { start_time: now, end_time: new Date(now.getTime() + (i + 1) * 60 * 60 * 1000) },
-    //     { upsert: true, new: true }
-    //   );
-    // }
-    // console.log("✅ Vet schedules seeded");
-
+    // --- Bookings ---
     const bookingData = [
-      {
-        user_id: users[0]._id,
-        pet_id: pets[0]._id,
-        services: [{ service_id: services[2]._id, quantity: 1 }],
-        veterinarian_id: vets[0]._id,
-        booking_date: new Date(),
-        note: "First checkup",
-      },
-      {
-        user_id: users[1]._id,
-        pet_id: pets[1]._id,
-        services: [{ service_id: services[0]._id, quantity: 1 }],
-        veterinarian_id: vets[1]._id,
-        booking_date: new Date(),
-        note: "Grooming appointment",
-      },
-      {
-        user_id: users[2]._id,
-        pet_id: pets[2]._id,
-        services: [{ service_id: services[3]._id, quantity: 1 }],
-        veterinarian_id: vets[2]._id,
-        booking_date: new Date(),
-        note: "Vaccination day",
-      },
-      {
-        user_id: users[3]._id,
-        pet_id: pets[3]._id,
-        services: [{ service_id: services[1]._id, quantity: 1 }],
-        veterinarian_id: vets[3]._id,
-        booking_date: new Date(),
-        note: "Boarding for holiday",
-      },
-      {
-        user_id: users[4]._id,
-        pet_id: pets[4]._id,
-        services: [{ service_id: services[4]._id, quantity: 1 }],
-        veterinarian_id: vets[4]._id,
-        booking_date: new Date(),
-        note: "Adoption consultation",
-      },
+      { user_id: users[0]._id, pet_id: pets[0]._id, services: [{ service_id: services[2]._id, quantity: 1 }], veterinarian_id: vets[0]._id, booking_date: new Date(), note: "First checkup" },
+      { user_id: users[1]._id, pet_id: pets[1]._id, services: [{ service_id: services[0]._id, quantity: 1 }], veterinarian_id: vets[1]._id, booking_date: new Date(), note: "Grooming appointment" },
+      { user_id: users[2]._id, pet_id: pets[2]._id, services: [{ service_id: services[3]._id, quantity: 1 }], veterinarian_id: vets[2]._id, booking_date: new Date(), note: "Vaccination day" },
+      { user_id: users[3]._id, pet_id: pets[3]._id, services: [{ service_id: services[1]._id, quantity: 1 }], veterinarian_id: vets[3]._id, booking_date: new Date(), note: "Boarding for holiday" },
+      { user_id: users[4]._id, pet_id: pets[4]._id, services: [{ service_id: services[4]._id, quantity: 1 }], veterinarian_id: vets[4]._id, booking_date: new Date(), note: "Adoption consultation" },
     ];
 
     for (const b of bookingData) {
