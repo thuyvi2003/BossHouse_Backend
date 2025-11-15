@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const eventController = require('../controllers/event.controller');
 const protectRoute = require('../middleware/auth.middleware');
-const optionalAuth = require('../middleware/optionalAuth.middleware');
 const { uploadSingle } = require('../middleware/upload.middleware');
 const { uploadToCloudinary } = require('../services/cloudinary.services');
 
@@ -17,14 +16,14 @@ router.get('/', eventController.getAllEvents);
 router.get('/search', eventController.searchEvents);
 router.get('/filter', eventController.filterEvents);
 router.get('/admin/filter', protectRoute(['admin']), eventController.filterEvents);
-router.get('/:id', optionalAuth, eventController.getEventById);
+router.get('/:id', protectRoute(), eventController.getEventById);
 
 // User routes
 router.post('/:id/register', protectRoute(), eventController.registerForEvent);
 router.post('/:id/cancel', protectRoute(), eventController.cancelRegistration);
 router.get('/my/registrations', protectRoute(), eventController.getMyRegistrations);
 
-// Upload route - Cloudinary
+// Upload route
 router.post('/upload', protectRoute(['admin']), uploadSingle('file'), async (req, res) => {
   try {
     if (!req.file) {
