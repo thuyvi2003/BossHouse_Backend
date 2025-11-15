@@ -72,11 +72,10 @@ const userSchema = new mongoose.Schema(
 
 // 🔑 Hash password before saving
 userSchema.pre("save", async function (next) {
-    // Only hash the password if it's been modified AND the user doesn't have a google_id
-    if (!this.isModified("password") || this.google_id) {
+    // Hash if modified AND it's not a pure Google-only account (has password field)
+    if (!this.isModified("password") || (!this.password && this.google_id)) {
         return next();
     }
-
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
